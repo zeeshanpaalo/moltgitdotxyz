@@ -1774,4 +1774,3 @@ func securityHeaders() func(http.Handler) http.Handler {
 		})
 	}
 }
-

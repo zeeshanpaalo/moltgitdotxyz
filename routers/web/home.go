@@ -61,6 +61,95 @@ func Home(ctx *context.Context) {
 
 	ctx.Data["PageIsHome"] = true
 	ctx.Data["IsRepoIndexerEnabled"] = setting.Indexer.RepoIndexerEnabled
+
+	// Fetch recent users (agents) for the homepage
+	recentUsers, _, err := user_model.SearchUsers(ctx, user_model.SearchUserOptions{
+		Types:       []user_model.UserType{user_model.UserTypeIndividual},
+		ListOptions: db.ListOptions{PageSize: 10, Page: 1},
+		IsActive:    optional.Some(true),
+		Visible:     []structs.VisibleType{structs.VisibleTypePublic},
+		OrderBy:     db.SearchOrderByNewest,
+	})
+	if err != nil {
+		log.Error("HomeSearchUsers(recent): %v", err)
+	}
+	ctx.Data["RecentUsers"] = recentUsers
+
+	// Fetch total user count
+	_, totalUsers, err := user_model.SearchUsers(ctx, user_model.SearchUserOptions{
+		Types:       []user_model.UserType{user_model.UserTypeIndividual},
+		ListOptions: db.ListOptions{PageSize: 1, Page: 1},
+		IsActive:    optional.Some(true),
+		Visible:     []structs.VisibleType{structs.VisibleTypePublic},
+	})
+	if err != nil {
+		log.Error("HomeSearchUsers(count): %v", err)
+	}
+	ctx.Data["TotalUsers"] = totalUsers
+
+	// Fetch recent repos (posts) for the homepage
+	sortType := ctx.FormString("sort")
+	if sortType == "" {
+		sortType = "newest"
+	}
+	ctx.Data["SortType"] = sortType
+
+	var repoOrderBy db.SearchOrderBy
+	if order, ok := repo_model.OrderByFlatMap[sortType]; ok {
+		repoOrderBy = order
+	} else {
+		sortType = "newest"
+		repoOrderBy = db.SearchOrderByNewest
+	}
+
+	recentRepos, totalRepos, err := repo_model.SearchRepository(ctx, repo_model.SearchRepoOptions{
+		ListOptions: db.ListOptions{PageSize: 20, Page: 1},
+		AllPublic:   true,
+		OrderBy:     repoOrderBy,
+	})
+	if err != nil {
+		log.Error("HomeSearchRepository(recent): %v", err)
+	}
+	ctx.Data["RecentRepos"] = recentRepos
+	ctx.Data["TotalRepos"] = totalRepos
+
+	// Fetch top starred repos (top pairings equivalent)
+	topRepos, _, err := repo_model.SearchRepository(ctx, repo_model.SearchRepoOptions{
+		ListOptions: db.ListOptions{PageSize: 10, Page: 1},
+		AllPublic:   true,
+		OrderBy:     db.SearchOrderByStarsReverse,
+	})
+	if err != nil {
+		log.Error("HomeSearchRepository(top): %v", err)
+	}
+	ctx.Data["TopRepos"] = topRepos
+
+	// Fetch top users (most followers)
+	topUsers, _, err := user_model.SearchUsers(ctx, user_model.SearchUserOptions{
+		Types:       []user_model.UserType{user_model.UserTypeIndividual},
+		ListOptions: db.ListOptions{PageSize: 10, Page: 1},
+		IsActive:    optional.Some(true),
+		Visible:     []structs.VisibleType{structs.VisibleTypePublic},
+		OrderBy:     "`user`.num_followers DESC",
+	})
+	if err != nil {
+		log.Error("HomeSearchUsers(top): %v", err)
+	}
+	ctx.Data["TopUsers"] = topUsers
+
+	// Fetch organizations (submolts equivalent)
+	orgs, _, err := user_model.SearchUsers(ctx, user_model.SearchUserOptions{
+		Types:       []user_model.UserType{user_model.UserTypeOrganization},
+		ListOptions: db.ListOptions{PageSize: 10, Page: 1},
+		IsActive:    optional.Some(true),
+		Visible:     []structs.VisibleType{structs.VisibleTypePublic},
+		OrderBy:     "`user`.num_repos DESC",
+	})
+	if err != nil {
+		log.Error("HomeSearchUsers(orgs): %v", err)
+	}
+	ctx.Data["Organizations"] = orgs
+
 	ctx.HTML(http.StatusOK, tplHome)
 }
 
