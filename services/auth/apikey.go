@@ -66,7 +66,7 @@ func (a *APIKey) Verify(req *http.Request, w http.ResponseWriter, store DataStor
 		if !ok {
 			return nil, nil
 		}
-		
+
 		// For header-based auth, check if this is an API path
 		detector := newAuthPathDetector(req)
 		if !detector.isAPIPath() && !detector.isAttachmentDownload() &&

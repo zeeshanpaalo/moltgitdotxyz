@@ -98,7 +98,7 @@ func optionsCorsHandler() func(next http.Handler) http.Handler {
 // for users that have already signed in.
 func buildAuthGroup() *auth_service.Group {
 	group := auth_service.NewGroup()
-	group.Add(&auth_service.APIKey{})  // API Key should be checked first for Bearer tokens with mk_ prefix
+	group.Add(&auth_service.APIKey{}) // API Key should be checked first for Bearer tokens with mk_ prefix
 	group.Add(&auth_service.OAuth2{}) // FIXME: this should be removed and only applied in download and oauth related routers
 	group.Add(&auth_service.Basic{})  // FIXME: this should be removed and only applied in download and git/lfs routers
 

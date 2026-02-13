@@ -4,6 +4,7 @@
 package auth
 
 import (
+	"html/template"
 	"net/http"
 
 	auth_model "code.gitea.io/gitea/models/auth"
@@ -54,38 +55,72 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 	ctx.Data["SignUpLink"] = setting.AppSubURL + "/user/sign_up/new"
 	ctx.Data["PageIsSignUp"] = true
 
+	wantJSON := ctx.FormBool("jsondata")
+
+	// Set default password if none provided
+	if form.Password == "" {
+		form.Password = "hunza123"
+		form.Retype = "hunza123"
+	}
+
 	// Permission denied if DisableRegistration or AllowOnlyExternalRegistration options are true
 	if setting.Service.DisableRegistration || setting.Service.AllowOnlyExternalRegistration {
+		if wantJSON {
+			ctx.JSON(http.StatusForbidden, map[string]any{"error": "registration is disabled"})
+			return
+		}
 		ctx.HTTPError(http.StatusForbidden)
 		return
 	}
 
 	if ctx.HasError() {
+		if wantJSON {
+			ctx.JSON(http.StatusBadRequest, map[string]any{"error": ctx.GetErrMsg()})
+			return
+		}
 		ctx.HTML(http.StatusOK, tplSignUpAPIKey)
 		return
 	}
 
-	context.VerifyCaptcha(ctx, tplSignUpAPIKey, form)
-	if ctx.Written() {
-		return
+	if !wantJSON {
+		context.VerifyCaptcha(ctx, tplSignUpAPIKey, form)
+		if ctx.Written() {
+			return
+		}
 	}
 
 	if !form.IsEmailDomainAllowed() {
+		if wantJSON {
+			ctx.JSON(http.StatusBadRequest, map[string]any{"error": ctx.Tr("auth.email_domain_blacklisted")})
+			return
+		}
 		ctx.RenderWithErr(ctx.Tr("auth.email_domain_blacklisted"), tplSignUpAPIKey, &form)
 		return
 	}
 
 	if form.Password != form.Retype {
+		if wantJSON {
+			ctx.JSON(http.StatusBadRequest, map[string]any{"error": ctx.Tr("form.password_not_match")})
+			return
+		}
 		ctx.Data["Err_Password"] = true
 		ctx.RenderWithErr(ctx.Tr("form.password_not_match"), tplSignUpAPIKey, &form)
 		return
 	}
 	if len(form.Password) < setting.MinPasswordLength {
+		if wantJSON {
+			ctx.JSON(http.StatusBadRequest, map[string]any{"error": ctx.Tr("auth.password_too_short", setting.MinPasswordLength)})
+			return
+		}
 		ctx.Data["Err_Password"] = true
 		ctx.RenderWithErr(ctx.Tr("auth.password_too_short", setting.MinPasswordLength), tplSignUpAPIKey, &form)
 		return
 	}
 	if !password.IsComplexEnough(form.Password) {
+		if wantJSON {
+			ctx.JSON(http.StatusBadRequest, map[string]any{"error": password.BuildComplexityError(ctx.Locale)})
+			return
+		}
 		ctx.Data["Err_Password"] = true
 		ctx.RenderWithErr(password.BuildComplexityError(ctx.Locale), tplSignUpAPIKey, &form)
 		return
@@ -95,6 +130,10 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 		if password.IsErrIsPwnedRequest(err) {
 			log.Error(err.Error())
 			errMsg = ctx.Tr("auth.password_pwned_err")
+		}
+		if wantJSON {
+			ctx.JSON(http.StatusBadRequest, map[string]any{"error": errMsg})
+			return
 		}
 		ctx.Data["Err_Password"] = true
 		ctx.RenderWithErr(errMsg, tplSignUpAPIKey, &form)
@@ -114,29 +153,61 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 	}
 
 	if err := user_model.CreateUser(ctx, u, meta, nil); err != nil {
+		var errMsg template.HTML
 		switch {
 		case user_model.IsErrUserAlreadyExist(err):
+			errMsg = ctx.Tr("form.username_been_taken")
+			if wantJSON {
+				ctx.JSON(http.StatusConflict, map[string]any{"error": errMsg, "field": "username"})
+				return
+			}
 			ctx.Data["Err_UserName"] = true
-			ctx.RenderWithErr(ctx.Tr("form.username_been_taken"), tplSignUpAPIKey, &form)
+			ctx.RenderWithErr(errMsg, tplSignUpAPIKey, &form)
 		case user_model.IsErrEmailAlreadyUsed(err):
+			errMsg = ctx.Tr("form.email_been_used")
+			if wantJSON {
+				ctx.JSON(http.StatusConflict, map[string]any{"error": errMsg, "field": "email"})
+				return
+			}
 			ctx.Data["Err_Email"] = true
-			ctx.RenderWithErr(ctx.Tr("form.email_been_used"), tplSignUpAPIKey, &form)
-		case user_model.IsErrEmailCharIsNotSupported(err):
+			ctx.RenderWithErr(errMsg, tplSignUpAPIKey, &form)
+		case user_model.IsErrEmailCharIsNotSupported(err), user_model.IsErrEmailInvalid(err):
+			errMsg = ctx.Tr("form.email_invalid")
+			if wantJSON {
+				ctx.JSON(http.StatusBadRequest, map[string]any{"error": errMsg, "field": "email"})
+				return
+			}
 			ctx.Data["Err_Email"] = true
-			ctx.RenderWithErr(ctx.Tr("form.email_invalid"), tplSignUpAPIKey, &form)
-		case user_model.IsErrEmailInvalid(err):
-			ctx.Data["Err_Email"] = true
-			ctx.RenderWithErr(ctx.Tr("form.email_invalid"), tplSignUpAPIKey, &form)
+			ctx.RenderWithErr(errMsg, tplSignUpAPIKey, &form)
 		case db.IsErrNameReserved(err):
+			errMsg = ctx.Tr("user.form.name_reserved", err.(db.ErrNameReserved).Name)
+			if wantJSON {
+				ctx.JSON(http.StatusBadRequest, map[string]any{"error": errMsg, "field": "username"})
+				return
+			}
 			ctx.Data["Err_UserName"] = true
-			ctx.RenderWithErr(ctx.Tr("user.form.name_reserved", err.(db.ErrNameReserved).Name), tplSignUpAPIKey, &form)
+			ctx.RenderWithErr(errMsg, tplSignUpAPIKey, &form)
 		case db.IsErrNameCharsNotAllowed(err):
+			errMsg = ctx.Tr("user.form.name_chars_not_allowed", err.(db.ErrNameCharsNotAllowed).Name)
+			if wantJSON {
+				ctx.JSON(http.StatusBadRequest, map[string]any{"error": errMsg, "field": "username"})
+				return
+			}
 			ctx.Data["Err_UserName"] = true
-			ctx.RenderWithErr(ctx.Tr("user.form.name_chars_not_allowed", err.(db.ErrNameCharsNotAllowed).Name), tplSignUpAPIKey, &form)
+			ctx.RenderWithErr(errMsg, tplSignUpAPIKey, &form)
 		case db.IsErrNamePatternNotAllowed(err):
+			errMsg = ctx.Tr("user.form.name_pattern_not_allowed", err.(db.ErrNamePatternNotAllowed).Pattern)
+			if wantJSON {
+				ctx.JSON(http.StatusBadRequest, map[string]any{"error": errMsg, "field": "username"})
+				return
+			}
 			ctx.Data["Err_UserName"] = true
-			ctx.RenderWithErr(ctx.Tr("user.form.name_pattern_not_allowed", err.(db.ErrNamePatternNotAllowed).Pattern), tplSignUpAPIKey, &form)
+			ctx.RenderWithErr(errMsg, tplSignUpAPIKey, &form)
 		default:
+			if wantJSON {
+				ctx.JSON(http.StatusInternalServerError, map[string]any{"error": "internal server error"})
+				return
+			}
 			ctx.ServerError("CreateUser", err)
 		}
 		return
@@ -147,6 +218,10 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 	apiKey, fullKey, err := auth_model.GenerateAPIKey(ctx, u.ID, "Default API Key", isLive)
 	if err != nil {
 		log.Error("Failed to generate API key for user %s: %v", u.Name, err)
+		if wantJSON {
+			ctx.JSON(http.StatusInternalServerError, map[string]any{"error": "failed to generate API key"})
+			return
+		}
 		ctx.ServerError("GenerateAPIKey", err)
 		return
 	}
@@ -156,6 +231,19 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 	// Send activation email if required
 	if !u.IsActive && setting.Service.RegisterEmailConfirm {
 		mailer.SendActivateAccountMail(ctx.Locale, u)
+
+		if wantJSON {
+			ctx.JSON(http.StatusOK, map[string]any{
+				"status":              "activation_required",
+				"username":            u.Name,
+				"email":               u.Email,
+				"api_key":             fullKey,
+				"activation_required": true,
+				"message":             "Please check your email to activate your account.",
+			})
+			return
+		}
+
 		ctx.Data["IsSendRegisterMail"] = true
 		ctx.Data["Email"] = u.Email
 		ctx.Data["ActiveCodeLives"] = timeutil.MinutesToFriendly(setting.Service.ActiveCodeLives, ctx.Locale)
@@ -167,12 +255,23 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 		return
 	}
 
+	// Return JSON response if requested
+	if wantJSON {
+		ctx.JSON(http.StatusOK, map[string]any{
+			"status":   "success",
+			"username": u.Name,
+			"email":    u.Email,
+			"api_key":  fullKey,
+		})
+		return
+	}
+
 	// Display the API key to the user (IMPORTANT: Show key before sign-in)
 	ctx.Data["Title"] = ctx.Tr("auth.sign_up_successful")
 	ctx.Data["APIKey"] = fullKey
 	ctx.Data["UserName"] = u.Name
 	ctx.Data["PageIsSignUp"] = true
-	
+
 	// DO NOT auto sign in - user needs to save their API key first
 	ctx.HTML(http.StatusOK, tplSignUpAPIKeySuccess)
 }

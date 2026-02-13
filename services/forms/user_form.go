@@ -88,10 +88,10 @@ func (f *InstallForm) Validate(req *http.Request, errs binding.Errors) binding.E
 
 // RegisterForm form for registering
 type RegisterForm struct {
-	UserName string `binding:"Required;Username;MaxSize(40)"`
-	Email    string `binding:"Required;MaxSize(254)"`
-	Password string `binding:"MaxSize(255)"`
-	Retype   string
+	UserName string `binding:"Required;Username;MaxSize(40)" json:"username"`
+	Email    string `binding:"Required;MaxSize(254)" json:"email"`
+	Password string `binding:"MaxSize(255)" json:"password"`
+	Retype   string `json:"retype"`
 }
 
 // Validate validates the fields

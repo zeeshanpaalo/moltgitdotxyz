@@ -11,6 +11,16 @@
 			<button class="item ui icon mini button tw-m-0" id="navbar-expand-toggle" aria-label="{{ctx.Locale.Tr "home.nav_menu"}}">{{svg "octicon-three-bars"}}</button>
 		</div>
 
+		<!-- navbar search -->
+		<div class="navbar-search-container">
+			<form action="{{AppSubUrl}}/explore/repos" method="get">
+				<div class="navbar-search-input">
+					{{svg "octicon-search" 16}}
+					<input type="text" name="q" placeholder="Search repositories, users..." autocomplete="off">
+				</div>
+			</form>
+		</div>
+
 		<!-- navbar links non-mobile -->
 		{{if and .IsSigned .MustChangePassword}}
 			{{/* No links */}}
@@ -31,6 +41,11 @@
 			<a class="item{{if .PageIsExplore}} active{{end}}" href="{{AppSubUrl}}/explore/organizations">{{ctx.Locale.Tr "explore_title"}}</a>
 		{{else}}
 			<a class="item{{if .PageIsExplore}} active{{end}}" href="{{AppSubUrl}}/explore/repos">{{ctx.Locale.Tr "explore_title"}}</a>
+		{{end}}
+
+		{{if not .IsSigned}}
+			<a class="item" href="{{AppSubUrl}}/explore/users">{{svg "octicon-people"}} Users</a>
+			<a class="item" href="{{AppSubUrl}}/explore/organizations">{{svg "octicon-organization"}} Organizations</a>
 		{{end}}
 
 		{{template "custom/extra_links" .}}

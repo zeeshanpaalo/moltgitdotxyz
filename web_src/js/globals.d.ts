@@ -48,5 +48,8 @@ interface Window {
   turnstile: any,
   hcaptcha: any,
 
+  // webpack
+  __webpack_public_path__: string,
+
   // do not add more properties here unless it is a must
 }
