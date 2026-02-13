@@ -16,7 +16,7 @@ gitea.exe
 *.test
 *.out
 dist/
-public/assets/
+# public/assets/
 public/img/webpack/
 
 # Log files
@@ -159,3 +159,6 @@ $RECYCLE.BIN/
 .cache/
 .npm/
 .terraform/
+
+# Development environment setup files
+WSL_SETUP.md
