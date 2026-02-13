@@ -1,0 +1,78 @@
+{{template "user/settings/layout_head" (dict "ctxData" . "pageClass" "user settings apikeys")}}
+	<div class="user-setting-content">
+		<h4 class="ui top attached header">
+			{{ctx.Locale.Tr "settings.api_keys"}}
+		</h4>
+		<div class="ui attached segment">
+			<div class="flex-list">
+				<div class="flex-item">
+					<p>API Keys allow you to authenticate API requests using Bearer tokens. These keys start with <code>mk_live_</code> (production) or <code>mk_test_</code> (development).</p>
+					<p><strong>Current Environment:</strong> <code>{{.Environment}}</code></p>
+				</div>
+				{{range .APIKeys}}
+					<div class="flex-item">
+						<div class="flex-item-leading">
+							<span class="text" data-tooltip-content="API Key">
+								{{svg "octicon-key" 32}}
+							</span>
+						</div>
+						<div class="flex-item-main">
+							<div class="flex-item-title">{{.Name}}</div>
+							<div class="flex-item-body">
+								<p class="tw-my-1">
+									<strong>Prefix:</strong> <code>{{.KeyPrefix}}</code> 
+									{{if .IsLive}}
+										<span class="ui green label">Production</span>
+									{{else}}
+										<span class="ui yellow label">Development</span>
+									{{end}}
+								</p>
+								<p class="tw-my-1">
+									<strong>Last 8 chars:</strong> <code>...{{.KeyLastEight}}</code>
+								</p>
+								<i>Created {{DateUtils.AbsoluteShort .CreatedUnix}}{{if .LastUsedUnix}} — Last used {{DateUtils.AbsoluteShort .LastUsedUnix}}{{else}} — Never used{{end}}</i>
+							</div>
+						</div>
+						<div class="flex-item-trailing">
+							<button class="ui red tiny button delete-button" data-modal-id="delete-apikey" data-url="{{$.Link}}/delete" data-id="{{.ID}}">
+								{{svg "octicon-trash" 16 "tw-mr-1"}}
+								{{ctx.Locale.Tr "settings.delete_key"}}
+							</button>
+						</div>
+					</div>
+				{{end}}
+			</div>
+		</div>
+		<div class="ui bottom attached segment">
+			<details {{if not .APIKeys}}open{{end}}>
+				<summary><h4 class="ui header tw-inline-block tw-my-2">Generate New API Key</h4></summary>
+				<form class="ui form ignore-dirty" action="{{.Link}}" method="post">
+					{{.CsrfTokenHtml}}
+					<div class="field">
+						<label for="name">Key Name</label>
+						<input id="name" name="name" value="" placeholder="My API Key" required maxlength="255">
+					</div>
+					<div class="ui info message">
+						<p>This will generate a new API key for the <strong>{{.Environment}}</strong> environment.</p>
+						<p>The key will start with <code>{{if eq .Environment "production"}}mk_live_{{else}}mk_test_{{end}}</code></p>
+					</div>
+					<button class="ui primary button">
+						Generate API Key
+					</button>
+				</form>
+			</details>
+		</div>
+	</div>
+
+<div class="ui g-modal-confirm delete modal" id="delete-apikey">
+	<div class="header">
+		{{svg "octicon-trash"}}
+		Delete API Key
+	</div>
+	<div class="content">
+		<p>{{ctx.Locale.Tr "settings.api_key_deletion_desc"}}</p>
+	</div>
+	{{template "base/modal_actions_confirm" .}}
+</div>
+
+{{template "user/settings/layout_footer" .}}
