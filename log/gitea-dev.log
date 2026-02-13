@@ -1,0 +1,116 @@
+2026/02/13 03:30:18 cmd/web.go:264:runWeb() [I] Starting Gitea on PID: 61554
+2026/02/13 03:30:18 cmd/web.go:114:showWebStartupMessage() [I] Gitea version: 3b5a423a built with GNU Make 4.3, go1.26.0-X:jsonv2
+2026/02/13 03:30:18 cmd/web.go:115:showWebStartupMessage() [I] * RunMode: dev
+2026/02/13 03:30:18 cmd/web.go:116:showWebStartupMessage() [I] * AppPath: /home/wahab/projects/moltgit_core/gitea
+2026/02/13 03:30:18 cmd/web.go:117:showWebStartupMessage() [I] * WorkPath: /home/wahab/projects/gitea
+2026/02/13 03:30:18 cmd/web.go:118:showWebStartupMessage() [I] * CustomPath: /home/wahab/projects/gitea/custom
+2026/02/13 03:30:18 cmd/web.go:119:showWebStartupMessage() [I] * ConfigFile: /home/wahab/projects/moltgit_core/custom/conf/app.ini
+2026/02/13 03:30:18 cmd/web.go:120:showWebStartupMessage() [I] Prepare to run web server
+2026/02/13 03:30:18 routers/init.go:116:InitWebInstalled() [I] Git version: 2.43.0 (home: /home/wahab/projects/gitea/data/home)
+2026/02/13 03:30:18 modules/storage/storage.go:180:initAttachments() [I] Initialising Attachment storage with type: local
+2026/02/13 03:30:18 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/attachments
+2026/02/13 03:30:18 modules/storage/storage.go:170:initAvatars() [I] Initialising Avatar storage with type: local
+2026/02/13 03:30:18 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/avatars
+2026/02/13 03:30:18 modules/storage/storage.go:196:initRepoAvatars() [I] Initialising Repository Avatar storage with type: local
+2026/02/13 03:30:18 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/repo-avatars
+2026/02/13 03:30:18 modules/storage/storage.go:190:initLFS() [I] Initialising LFS storage with type: local
+2026/02/13 03:30:18 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/lfs
+2026/02/13 03:30:18 modules/storage/storage.go:202:initRepoArchives() [I] Initialising Repository Archive storage with type: local
+2026/02/13 03:30:18 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/repo-archive
+2026/02/13 03:30:18 modules/storage/storage.go:212:initPackages() [I] Initialising Packages storage with type: local
+2026/02/13 03:30:18 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/packages
+2026/02/13 03:30:18 modules/storage/storage.go:223:initActions() [I] Initialising Actions storage with type: local
+2026/02/13 03:30:18 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/actions_log
+2026/02/13 03:30:18 modules/storage/storage.go:227:initActions() [I] Initialising ActionsArtifacts storage with type: local
+2026/02/13 03:30:18 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/actions_artifacts
+2026/02/13 03:30:18 routers/common/db.go:24:InitDBEngine() [I] Beginning ORM engine initialization.
+2026/02/13 03:30:18 routers/common/db.go:31:InitDBEngine() [I] ORM engine initialization attempt #1/10...
+2026/02/13 03:30:18 cmd/web.go:206:serveInstalled() [I] PING DATABASE postgres
+2026/02/13 03:30:19 modules/git/git.go:146:InitSimple() [W] git module has been initialized already, duplicate init may work but it's better to fix it
+2026/02/13 03:30:19 cmd/web.go:206:serveInstalled() [W] Table oauth2_application Column confidential_client db default is true, struct default is TRUE
+2026/02/13 03:30:19 cmd/web.go:206:serveInstalled() [W] Table oauth2_application Column skip_secondary_authorization db default is false, struct default is FALSE
+2026/02/13 03:30:19 cmd/web.go:206:serveInstalled() [W] Table system_setting Column version db default is , struct default is 1
+2026/02/13 03:30:19 cmd/web.go:206:serveInstalled() [W] Table user Column max_repo_creation db default is '-1', struct default is -1
+2026/02/13 03:30:19 cmd/web.go:206:serveInstalled() [W] Table action_run Column concurrency_cancel db default is false, struct default is FALSE
+2026/02/13 03:30:19 cmd/web.go:206:serveInstalled() [W] Table action_run_job Column concurrency_cancel db default is false, struct default is FALSE
+2026/02/13 03:30:20 cmd/web.go:206:serveInstalled() [W] Table label Column archived_unix db default is , struct default is NULL
+2026/02/13 03:30:20 routers/init.go:143:InitWebInstalled() [I] ORM engine initialization successful!
+2026/02/13 03:30:20 .../indexer/issues/indexer.go:78:InitIssueIndexer.1() [I] PID 61554: Initializing Issue Indexer: bleve
+2026/02/13 03:30:20 .../indexer/stats/indexer.go:41:populateRepoIndexer() [I] Populating the repo stats indexer with existing repositories
+2026/02/13 03:30:20 .../indexer/stats/indexer.go:87:populateRepoIndexer() [I] Done (re)populating the repo stats indexer with existing repositories
+2026/02/13 03:30:20 .../indexer/issues/indexer.go:155:InitIssueIndexer.2() [I] Issue Indexer Initialization took 4.410429ms
+2026/02/13 03:30:20 cmd/web.go:330:listen() [I] Listen: http://0.0.0.0:3000
+2026/02/13 03:30:20 cmd/web.go:334:listen() [I] AppURL(ROOT_URL): http://localhost:3000/
+2026/02/13 03:30:20 cmd/web.go:337:listen() [I] LFS server enabled
+2026/02/13 03:30:20 modules/graceful/server.go:52:NewServer() [I] Starting new Web server: tcp:0.0.0.0:3000 on PID: 61554
+2026/02/13 03:30:21 .../context/context_response.go:99:(*Context).HTML() [E] Render failed: failed to render template: user/auth/signup_apikey, error: asset from: , template "user/auth/signup_apikey" not found
+2026/02/13 03:30:21 HTTPRequest [I] router: completed HEAD /user/sign_up/new for [::1]:43410, 200 OK in 10.9ms @ auth/auth_apikey.go:29(auth.SignUpAPIKey)
+2026/02/13 03:30:21 .../graceful/manager_unix.go:129:(*Manager).handleSignals() [I] PID: 61554. Received SIGHUP. Attempting GracefulRestart...
+2026/02/13 03:30:21 .../graceful/manager_unix.go:183:(*Manager).DoGracefulRestart() [I] PID: 61554. Forking...
+2026/02/13 03:30:21 modules/setting/log.go:62:prepareLoggerConfig() [E] Deprecation: config option `[log].ACCESS` present, please use `[log].logger.access.MODE` instead because this fallback will be/has been removed in 1.21
+2026/02/13 03:30:21 modules/setting/log.go:71:prepareLoggerConfig() [E] Deprecation: config option `[log].ROUTER` present, please use `[log].logger.router.MODE` instead because this fallback will be/has been removed in 1.21
+2026/02/13 03:30:21 modules/setting/log.go:83:prepareLoggerConfig() [E] Deprecation: config option `[log].XORM` present, please use `[log].logger.xorm.MODE` instead because this fallback will be/has been removed in 1.21
+2026/02/13 03:30:21 .../graceful/manager_unix.go:194:(*Manager).DoGracefulRestart() [I] PID: 61554. Shutting down after forking ...
+2026/02/13 03:30:21 cmd/web.go:381:listen() [I] HTTP Listener: 0.0.0.0:3000 Closed
+2026/02/13 03:30:21 .../graceful/server_hooks.go:45:(*Server).doShutdown() [I] PID: 61554 Listener ([::]:3000) closed.
+2026/02/13 03:30:21 modules/graceful/manager.go:164:(*Manager).doHammerTime() [W] Setting Hammer condition
+2026/02/13 03:30:21 cmd/web.go:262:runWeb() [I] Restarting Gitea on PID: 61599 from parent PID: 61554
+2026/02/13 03:30:21 cmd/web.go:114:showWebStartupMessage() [I] Gitea version: 3b5a423a built with GNU Make 4.3, go1.26.0-X:jsonv2
+2026/02/13 03:30:21 cmd/web.go:115:showWebStartupMessage() [I] * RunMode: dev
+2026/02/13 03:30:21 cmd/web.go:116:showWebStartupMessage() [I] * AppPath: /home/wahab/projects/moltgit_core/gitea
+2026/02/13 03:30:21 cmd/web.go:117:showWebStartupMessage() [I] * WorkPath: /home/wahab/projects/gitea
+2026/02/13 03:30:21 cmd/web.go:118:showWebStartupMessage() [I] * CustomPath: /home/wahab/projects/gitea/custom
+2026/02/13 03:30:21 cmd/web.go:119:showWebStartupMessage() [I] * ConfigFile: /home/wahab/projects/moltgit_core/custom/conf/app.ini
+2026/02/13 03:30:21 cmd/web.go:120:showWebStartupMessage() [I] Prepare to run web server
+2026/02/13 03:30:21 routers/init.go:116:InitWebInstalled() [I] Git version: 2.43.0 (home: /home/wahab/projects/gitea/data/home)
+2026/02/13 03:30:21 modules/storage/storage.go:180:initAttachments() [I] Initialising Attachment storage with type: local
+2026/02/13 03:30:21 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/attachments
+2026/02/13 03:30:21 modules/storage/storage.go:170:initAvatars() [I] Initialising Avatar storage with type: local
+2026/02/13 03:30:21 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/avatars
+2026/02/13 03:30:21 modules/storage/storage.go:196:initRepoAvatars() [I] Initialising Repository Avatar storage with type: local
+2026/02/13 03:30:21 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/repo-avatars
+2026/02/13 03:30:21 modules/storage/storage.go:190:initLFS() [I] Initialising LFS storage with type: local
+2026/02/13 03:30:21 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/lfs
+2026/02/13 03:30:21 modules/storage/storage.go:202:initRepoArchives() [I] Initialising Repository Archive storage with type: local
+2026/02/13 03:30:21 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/repo-archive
+2026/02/13 03:30:21 modules/storage/storage.go:212:initPackages() [I] Initialising Packages storage with type: local
+2026/02/13 03:30:21 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/packages
+2026/02/13 03:30:21 modules/storage/storage.go:223:initActions() [I] Initialising Actions storage with type: local
+2026/02/13 03:30:21 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/actions_log
+2026/02/13 03:30:21 modules/storage/storage.go:227:initActions() [I] Initialising ActionsArtifacts storage with type: local
+2026/02/13 03:30:21 modules/storage/local.go:33:NewLocalStorage() [I] Creating new Local Storage at /home/wahab/projects/gitea/data/actions_artifacts
+2026/02/13 03:30:22 modules/graceful/manager.go:180:(*Manager).doTerminate() [W] Terminating
+2026/02/13 03:30:22 .../indexer/issues/indexer.go:122:InitIssueIndexer.1.2() [I] PID: 61554 Issue Indexer closed
+2026/02/13 03:30:22 .../graceful/manager_unix.go:154:(*Manager).handleSignals() [W] PID: 61554. Background context for manager closed - context canceled - Shutting down...
+2026/02/13 03:30:22 cmd/web.go:232:serveInstalled() [I] PID: 61554 Gitea Web Finished
+2026/02/13 03:30:22 routers/common/db.go:24:InitDBEngine() [I] Beginning ORM engine initialization.
+2026/02/13 03:30:22 routers/common/db.go:31:InitDBEngine() [I] ORM engine initialization attempt #1/10...
+2026/02/13 03:30:22 cmd/web.go:206:serveInstalled() [I] PING DATABASE postgres
+2026/02/13 03:30:23 modules/git/git.go:146:InitSimple() [W] git module has been initialized already, duplicate init may work but it's better to fix it
+2026/02/13 03:30:23 cmd/web.go:206:serveInstalled() [W] Table oauth2_application Column confidential_client db default is true, struct default is TRUE
+2026/02/13 03:30:23 cmd/web.go:206:serveInstalled() [W] Table oauth2_application Column skip_secondary_authorization db default is false, struct default is FALSE
+2026/02/13 03:30:23 cmd/web.go:206:serveInstalled() [W] Table system_setting Column version db default is , struct default is 1
+2026/02/13 03:30:23 cmd/web.go:206:serveInstalled() [W] Table user Column max_repo_creation db default is '-1', struct default is -1
+2026/02/13 03:30:23 cmd/web.go:206:serveInstalled() [W] Table action_run Column concurrency_cancel db default is false, struct default is FALSE
+2026/02/13 03:30:23 cmd/web.go:206:serveInstalled() [W] Table action_run_job Column concurrency_cancel db default is false, struct default is FALSE
+2026/02/13 03:30:24 cmd/web.go:206:serveInstalled() [W] Table label Column archived_unix db default is , struct default is NULL
+2026/02/13 03:30:24 routers/init.go:143:InitWebInstalled() [I] ORM engine initialization successful!
+2026/02/13 03:30:24 .../indexer/issues/indexer.go:78:InitIssueIndexer.1() [I] PID 61599: Initializing Issue Indexer: bleve
+2026/02/13 03:30:24 .../indexer/issues/indexer.go:155:InitIssueIndexer.2() [I] Issue Indexer Initialization took 625.321µs
+2026/02/13 03:30:24 .../indexer/stats/indexer.go:41:populateRepoIndexer() [I] Populating the repo stats indexer with existing repositories
+2026/02/13 03:30:24 .../indexer/stats/indexer.go:87:populateRepoIndexer() [I] Done (re)populating the repo stats indexer with existing repositories
+2026/02/13 03:30:24 cmd/web.go:330:listen() [I] Listen: http://0.0.0.0:3000
+2026/02/13 03:30:24 cmd/web.go:334:listen() [I] AppURL(ROOT_URL): http://localhost:3000/
+2026/02/13 03:30:24 cmd/web.go:337:listen() [I] LFS server enabled
+2026/02/13 03:30:24 modules/graceful/server.go:50:NewServer() [I] Restarting new Web server: tcp:0.0.0.0:3000 on PID: 61599
+2026/02/13 03:30:31 .../context/context_response.go:99:(*Context).HTML() [E] Render failed: failed to render template: user/auth/signup_apikey, error: asset from: , template "user/auth/signup_apikey" not found
+2026/02/13 03:30:31 HTTPRequest [I] router: completed GET /user/sign_up/new for [::1]:44078, 200 OK in 4.5ms @ auth/auth_apikey.go:29(auth.SignUpAPIKey)
+2026/02/13 03:30:31 HTTPRequest [I] router: completed GET /.well-known/appspecific/com.chrome.devtools.json for [::1]:44078, 404 Not Found in 0.5ms @ public/public.go:34(web.registerWebRoutes.(*Router).Group.registerWebRoutes.func19.FileHandlerFunc)
+2026/02/13 03:33:14 .../context/context_response.go:99:(*Context).HTML() [E] Render failed: failed to render template: user/auth/signup_apikey, error: asset from: , template "user/auth/signup_apikey" not found
+2026/02/13 03:33:14 HTTPRequest [I] router: completed GET /user/sign_up/new for [::1]:36868, 200 OK in 5.3ms @ auth/auth_apikey.go:29(auth.SignUpAPIKey)
+2026/02/13 03:33:14 HTTPRequest [I] router: completed GET /.well-known/appspecific/com.chrome.devtools.json for [::1]:36868, 404 Not Found in 0.3ms @ public/public.go:34(web.registerWebRoutes.(*Router).Group.registerWebRoutes.func19.FileHandlerFunc)
+2026/02/13 03:34:32 .../graceful/manager_unix.go:144:(*Manager).handleSignals() [W] PID 61599. Received SIGTERM. Shutting down...
+2026/02/13 03:34:32 .../graceful/manager_unix.go:154:(*Manager).handleSignals() [W] PID: 61599. Background context for manager closed - context canceled - Shutting down...
+2026/02/13 03:34:32 cmd/web.go:381:listen() [I] HTTP Listener: 0.0.0.0:3000 Closed
+2026/02/13 03:34:32 .../graceful/server_hooks.go:45:(*Server).doShutdown() [I] PID: 61599 Listener ([::]:3000) closed.
+2026/02/13 03:34:32 cmd/web.go:232:serveInstalled() [I] PID: 61599 Gitea Web Finished
