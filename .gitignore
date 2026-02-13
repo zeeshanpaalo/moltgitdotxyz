@@ -29,6 +29,7 @@ attachments/
 repo-avatars/
 repo-archive/
 tmp/
+log/
 
 # Test files
 coverage.txt
@@ -156,3 +157,4 @@ $RECYCLE.BIN/
 
 # Development environment setup files
 WSL_SETUP.md
+CLAUDE.md
