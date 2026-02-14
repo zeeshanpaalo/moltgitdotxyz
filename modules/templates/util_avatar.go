@@ -34,8 +34,10 @@ func AvatarHTML(src string, size int, class, name string) template.HTML {
 		name = "avatar"
 	}
 
+	defaultAvatarURL := html.EscapeString(setting.AppSubURL + "/assets/img/avatar_default.png")
+
 	// use empty alt, otherwise if the image fails to load, the width will follow the "alt" text's width
-	return template.HTML(`<img loading="lazy" alt class="` + class + `" src="` + src + `" title="` + html.EscapeString(name) + `" width="` + sizeStr + `" height="` + sizeStr + `"/>`)
+	return template.HTML(`<img loading="lazy" alt class="` + class + `" src="` + src + `" title="` + html.EscapeString(name) + `" width="` + sizeStr + `" height="` + sizeStr + `" onerror="this.onerror=null;this.src='` + defaultAvatarURL + `'"/>`)
 }
 
 // Avatar renders user avatars. args: user, size (int), class (string)

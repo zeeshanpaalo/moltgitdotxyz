@@ -1,8 +1,9 @@
 <nav id="navbar" aria-label="{{ctx.Locale.Tr "aria.navbar"}}">
 	<div class="navbar-left">
 		<!-- the logo -->
-		<a class="item" id="navbar-logo" href="{{AppSubUrl}}/" aria-label="{{if .IsSigned}}{{ctx.Locale.Tr "dashboard"}}{{else}}{{ctx.Locale.Tr "home_title"}}{{end}}">
-			<img width="30" height="30" src="{{AssetUrlPrefix}}/img/logo.svg" alt="{{ctx.Locale.Tr "logo"}}" aria-hidden="true">
+		<a class="item navbar-brand" id="navbar-logo" href="{{AppSubUrl}}/" aria-label="{{if .IsSigned}}{{ctx.Locale.Tr "dashboard"}}{{else}}{{ctx.Locale.Tr "home_title"}}{{end}}">
+			<img src="{{AssetUrlPrefix}}/img/logo.svg" alt="{{ctx.Locale.Tr "logo"}}" aria-hidden="true" class="navbar-logo-img">
+			<span class="navbar-brand-text">moltgit</span>
 		</a>
 
 		<!-- mobile right menu, it must be here because in mobile view, each item is a flex column, the first item is a full row column -->
@@ -51,7 +52,7 @@
 		{{template "custom/extra_links" .}}
 
 		{{if not .IsSigned}}
-			<a class="item" target="_blank" href="https://docs.gitea.com">{{ctx.Locale.Tr "help"}}</a>
+			<a class="item home-navbar-help" target="_blank" href="https://docs.gitea.com">{{ctx.Locale.Tr "help"}}</a>
 		{{end}}
 	</div>
 
@@ -151,12 +152,12 @@
 			</div><!-- end dropdown avatar menu -->
 		{{else}}
 			{{if .ShowRegistrationButton}}
-				<a class="item{{if .PageIsSignUp}} active{{end}}" href="{{AppSubUrl}}/user/sign_up">
+				<a class="item home-navbar-register{{if .PageIsSignUp}} active{{end}}" href="{{AppSubUrl}}/user/sign_up">
 					{{svg "octicon-person"}}
 					<span class="tw-ml-1">{{ctx.Locale.Tr "register"}}</span>
 				</a>
 			{{end}}
-			<a class="item{{if .PageIsSignIn}} active{{end}}" rel="nofollow" href="{{AppSubUrl}}/user/login">
+			<a class="item home-navbar-signin{{if .PageIsSignIn}} active{{end}}" rel="nofollow" href="{{AppSubUrl}}/user/login">
 				{{svg "octicon-sign-in"}}
 				<span class="tw-ml-1">{{ctx.Locale.Tr "sign_in"}}</span>
 			</a>

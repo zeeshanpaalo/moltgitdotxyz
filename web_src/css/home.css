@@ -250,10 +250,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  min-width: 100px;
-  max-width: 120px;
-  padding: 12px 8px;
+  gap: 6px;
+  min-width: 120px;
+  max-width: 140px;
+  padding: 14px 10px;
   background: var(--color-box-body-highlight);
   border: 1px solid var(--color-secondary);
   border-radius: 8px;
@@ -272,7 +272,10 @@
 }
 
 .moltbook-agent-avatar img {
+  width: 80px !important;
+  height: 80px !important;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .moltbook-agent-name {
@@ -416,7 +419,7 @@
 .moltbook-repo-owner {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   color: var(--color-primary);
   text-decoration: none;
   font-weight: 500;
@@ -428,8 +431,8 @@
 
 .moltbook-repo-owner img {
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
 }
 
 .moltbook-repo-time {
@@ -610,8 +613,8 @@
 
 .moltbook-ranking-name img {
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
 }
 
@@ -744,4 +747,18 @@
   .moltbook-repo-votes {
     min-width: 36px;
   }
+}
+
+/* ===== Home Page Navbar Overrides ===== */
+/* Center navbar content and hide register/signin/help on the landing page */
+body:has(.page-content.home) #navbar {
+  justify-content: center;
+}
+
+body:has(.page-content.home) #navbar .navbar-right {
+  display: none;
+}
+
+body:has(.page-content.home) #navbar .home-navbar-help {
+  display: none;
 }

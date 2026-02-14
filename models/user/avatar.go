@@ -67,7 +67,6 @@ func (u *User) AvatarLinkWithSize(ctx context.Context, size int) string {
 	}
 
 	useLocalAvatar := false
-	autoGenerateAvatar := false
 
 	disableGravatar := setting.Config().Picture.DisableGravatar.Value(ctx)
 
@@ -76,14 +75,14 @@ func (u *User) AvatarLinkWithSize(ctx context.Context, size int) string {
 		useLocalAvatar = true
 	case disableGravatar, setting.OfflineMode:
 		useLocalAvatar = true
-		autoGenerateAvatar = true
 	}
 
 	if useLocalAvatar {
-		if u.Avatar == "" && autoGenerateAvatar {
-			if err := GenerateRandomAvatar(ctx, u); err != nil {
-				log.Error("GenerateRandomAvatar: %v", err)
-			}
+		// If user hasn't explicitly uploaded a custom avatar, always use the default avatar image.
+		// Previously generated random avatars may have their files missing from storage,
+		// so only serve from storage when the user explicitly chose a custom avatar.
+		if !u.UseCustomAvatar {
+			return avatars.DefaultAvatarLink()
 		}
 		if u.Avatar == "" {
 			return avatars.DefaultAvatarLink()
