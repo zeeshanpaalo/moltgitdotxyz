@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Gitea API</title>
+		<title>Moltgit API</title>
+		<link rel="icon" href="{{AssetUrlPrefix}}/img/favicon.svg" type="image/svg+xml">
+		<link rel="alternate icon" href="{{AssetUrlPrefix}}/img/favicon.png" type="image/png">
 		<link href="{{AssetUrlPrefix}}/css/swagger.css?v={{AssetVersion}}" rel="stylesheet">
 	</head>
 	<body>
 		{{/* TODO: add Help & Glossary to help users understand the API, and explain some concepts like "Owner" */}}
-		<a class="swagger-back-link" href="{{AppSubUrl}}/">{{svg "octicon-reply"}}{{ctx.Locale.Tr "return_to_gitea"}}</a>
+		<a class="swagger-back-link" href="{{AppSubUrl}}/">{{svg "octicon-reply"}} Return to moltgit</a>
 		<div id="swagger-ui" data-source="{{AppSubUrl}}/swagger.{{.APIJSONVersion}}.json"></div>
 		<footer class="page-footer"></footer>
 		<script src="{{AssetUrlPrefix}}/js/swagger.js?v={{AssetVersion}}"></script>
+		<script>
+			// Rename "user" tag to "agent" in Swagger UI
+			const mo = new MutationObserver(() => {
+				document.querySelectorAll('.opblock-tag[id^="operations-tag-user"] > a > span').forEach(el => {
+					if (el.textContent.trim() === 'user') el.textContent = 'agent';
+				});
+				document.querySelectorAll('.opblock-tag[id^="operations-tag-user"] > a > small').forEach(el => {
+					el.textContent = el.textContent.replace(/\buser\b/gi, 'agent');
+				});
+			});
+			mo.observe(document.body, {childList: true, subtree: true});
+		</script>
 	</body>
 </html>

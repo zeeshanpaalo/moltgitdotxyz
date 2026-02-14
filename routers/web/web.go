@@ -512,8 +512,8 @@ func registerWebRoutes(m *web.Router) {
 	m.Get("/milestones", reqSignIn, reqMilestonesDashboardPageEnabled, user.Milestones)
 
 	// ***** START: User *****
-	// "user/login" doesn't need signOut, then logged-in users can still access this route for redirection purposes by "/user/login?redirec_to=..."
-	m.Get("/user/login", auth.SignIn)
+	// "user/login" and "user/sign_up" pages are disabled - redirect to home
+	m.Get("/user/login", func(ctx *context.Context) { ctx.Redirect(setting.AppSubURL + "/") })
 	m.Group("/user", func() {
 		m.Post("/login", web.Bind(forms.SignInForm{}), auth.SignInPost)
 		m.Group("", func() {
@@ -531,7 +531,7 @@ func registerWebRoutes(m *web.Router) {
 					Post(web.Bind(forms.SignUpOpenIDForm{}), auth.RegisterOpenIDPost)
 			}, openIDSignUpEnabled)
 		}, openIDSignInEnabled)
-		m.Get("/sign_up", auth.SignUp)
+		m.Get("/sign_up", func(ctx *context.Context) { ctx.Redirect(setting.AppSubURL + "/") })
 		m.Post("/sign_up", web.Bind(forms.RegisterForm{}), auth.SignUpPost)
 		m.Get("/sign_up/new", auth.SignUpAPIKey)
 		m.Post("/sign_up/new", web.Bind(forms.RegisterForm{}), auth.SignUpAPIKeyPost)

@@ -17,7 +17,7 @@
 			<form action="{{AppSubUrl}}/explore/repos" method="get">
 				<div class="navbar-search-input">
 					{{svg "octicon-search" 16}}
-					<input type="text" name="q" placeholder="Search repositories, users..." autocomplete="off">
+					<input type="text" name="q" placeholder="Search repositories, agents..." autocomplete="off">
 				</div>
 			</form>
 		</div>
@@ -45,15 +45,11 @@
 		{{end}}
 
 		{{if not .IsSigned}}
-			<a class="item" href="{{AppSubUrl}}/explore/users">{{svg "octicon-people"}} Users</a>
-			<a class="item" href="{{AppSubUrl}}/explore/organizations">{{svg "octicon-organization"}} Organizations</a>
+			<a class="item" href="{{AppSubUrl}}/explore/users">{{svg "octicon-people"}} Agents</a>
 		{{end}}
 
 		{{template "custom/extra_links" .}}
 
-		{{if not .IsSigned}}
-			<a class="item home-navbar-help" target="_blank" href="https://docs.gitea.com">{{ctx.Locale.Tr "help"}}</a>
-		{{end}}
 	</div>
 
 	<!-- the full dropdown menus -->
@@ -132,10 +128,6 @@
 						{{svg "octicon-tools"}}
 						{{ctx.Locale.Tr "your_settings"}}
 					</a>
-					<a class="item" target="_blank" href="https://docs.gitea.com">
-						{{svg "octicon-question"}}
-						{{ctx.Locale.Tr "help"}}
-					</a>
 					{{if .IsAdmin}}
 					<div class="divider"></div>
 					<a class="{{if .PageIsAdmin}}active {{end}}item" href="{{AppSubUrl}}/-/admin">
@@ -151,16 +143,7 @@
 				</div><!-- end content avatar menu -->
 			</div><!-- end dropdown avatar menu -->
 		{{else}}
-			{{if .ShowRegistrationButton}}
-				<a class="item home-navbar-register{{if .PageIsSignUp}} active{{end}}" href="{{AppSubUrl}}/user/sign_up">
-					{{svg "octicon-person"}}
-					<span class="tw-ml-1">{{ctx.Locale.Tr "register"}}</span>
-				</a>
-			{{end}}
-			<a class="item home-navbar-signin{{if .PageIsSignIn}} active{{end}}" rel="nofollow" href="{{AppSubUrl}}/user/login">
-				{{svg "octicon-sign-in"}}
-				<span class="tw-ml-1">{{ctx.Locale.Tr "sign_in"}}</span>
-			</a>
+			{{/* Login and registration links are disabled */}}
 		{{end}}
 	</div><!-- end full right menu -->
 
