@@ -1,45 +1,146 @@
 import * as fs from "fs";
 import * as path from "path";
-import { v4 as uuid } from "uuid";
 import { askLLM } from "./llm";
-import { getIssues, createPR } from "./gitea";
+import { searchReposWithIssues, getIssuesForRepo, createPR } from "./gitea";
 import { freshClone, commitAndPush } from "./git";
-import { config } from "./config";
+
+/**
+ * 📖 Recursively read full repository codebase
+ */
+function readCodebase(dir: string): string {
+  const walk = (dirPath: string): string[] =>
+    fs.readdirSync(dirPath).flatMap((file) => {
+      const fullPath = path.join(dirPath, file);
+
+      if (fs.statSync(fullPath).isDirectory()) {
+        if (file === ".git") return [];
+        return walk(fullPath);
+      }
+
+      return [fullPath];
+    });
+
+  const files = walk(dir);
+
+  return files
+    .map((filePath) => {
+      const rel = path.relative(dir, filePath);
+      const content = fs.readFileSync(filePath, "utf8");
+      return `FILE: ${rel}\n${content}`;
+    })
+    .join("\n\n");
+}
+
+/**
+ * 🎲 Safe random picker
+ */
+function pickRandom<T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)];
+}
 
 export async function builderLoop() {
-  const issues = await getIssues();
-  if (!issues.length) return;
+  console.log("🔍 Searching public repos with open issues...");
 
-  const issue = issues[0];
-  const branch = `issue-${issue.number}-${uuid().slice(0, 4)}`;
-  const dir = "./workspace";
+  // 1️⃣ Get all public repos that support issues
+  const repos: any[] = await searchReposWithIssues();
 
-  await freshClone(dir, config.tokens.builder);
+  if (!repos || !repos.length) {
+    console.log("😴 No repos found.");
+    return;
+  }
 
-  const system = "You are an autonomous Node.js developer.";
+  // 2️⃣ Filter repos that actually have open issues
+  const reposWithOpenIssues = repos.filter(
+    (repo: any) => repo.open_issues_count > 0,
+  );
+
+  if (!reposWithOpenIssues.length) {
+    console.log("😴 No repos with open issues.");
+    return;
+  }
+
+  // 3️⃣ Randomly pick ONE repo
+  // (If only 1 exists, it will be selected naturally)
+  const selectedRepo = pickRandom(reposWithOpenIssues);
+
+  const repoOwner = selectedRepo.owner.login;
+  const repoName = selectedRepo.name;
+
+  console.log(`📦 Selected repo: ${repoOwner}/${repoName}`);
+
+  // 4️⃣ Fetch open issues for selected repo
+  const issues = await getIssuesForRepo(repoOwner, repoName);
+
+  if (!issues || !issues.length) {
+    console.log("⚠ Repo reported open issues but none returned.");
+    return;
+  }
+
+  // 5️⃣ Pick ONE issue randomly
+  const issue: any = pickRandom(issues);
+
+  console.log(`🛠 Working on issue #${issue.number}: ${issue.title}`);
+
+  const branch = `issue-${issue.number}`;
+  const dir = `./workspace-${repoName}`;
+
+  // 6️⃣ Clone repo
+  await freshClone(dir, "builder-1", repoOwner, repoName);
+
+  // 7️⃣ Read entire codebase
+  const codebase = readCodebase(dir);
+  console.log(codebase)
+  const isEmpty = codebase.trim().length === 0;
+
+  console.log(isEmpty ? "📁 Repository is empty. Will create boilerplate." : "📚 Codebase read successfully.");
+
+  // 8️⃣ Ask LLM to implement solution
+  const system = "You are a senior autonomous software engineer.";
+
   const user = `
-Build code for this issue:
+Repository: ${repoOwner}/${repoName}
 
+Issue:
 ${issue.title}
 ${issue.body}
 
-Generate JSON:
+Current Codebase:
+${codebase || "EMPTY REPOSITORY"}
+
+If repository is empty:
+- Choose appropriate language and framework.
+- Create full project boilerplate.
+
+You must fully implement the issue.
+
+Return STRICT JSON:
 {
-  branch_name: "...",
-  commit_message: "...",
-  files: [{ path: "...", content: "..." }]
+  "commit_message": "",
+  "files": [
+    { "path": "", "content": "" }
+  ]
 }
 `;
 
   const output = await askLLM(system, user);
   const parsed = JSON.parse(output);
 
+  // 9️⃣ Write files
   for (const file of parsed.files) {
     const fullPath = path.join(dir, file.path);
-    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+
+    fs.mkdirSync(path.dirname(fullPath), {
+      recursive: true,
+    });
+
     fs.writeFileSync(fullPath, file.content);
   }
 
+  // 🔟 Commit & push
   await commitAndPush(dir, branch, parsed.commit_message);
-  await createPR(config.tokens.builder, issue.title);
+
+  // 1️⃣1️⃣ Create PR
+  await createPR(repoOwner, repoName, issue.title, branch);
+
+  console.log(`✅ PR created for ${repoOwner}/${repoName}`);
 }

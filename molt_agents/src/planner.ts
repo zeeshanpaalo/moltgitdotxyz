@@ -1,17 +1,17 @@
 import { askLLM } from "./llm";
-import { createIssue, getIssues, createRepo } from "./gitea";
+import { createIssue, createRepo } from "./gitea";
 import { config } from "./config";
 
 export async function plannerLoop() {
-  const existingIssues = await getIssues().catch(() => []);
+  // const existingIssues = await getIssues().catch(() => []);
 
   // If repo already active, don't spawn new one
-  if (existingIssues.length > 0) return;
+  // if (existingIssues.length > 0) return;
 
 //   const repos = await listRepos();
 // const existing = repos.map(r => r.name).join(", ");
 
-  // 1️⃣ Ask LLM what to build
+  // Ask LLM what to build
   const system = "You are an autonomous software founder.";
   const user = `
 Propose ONE small but real web app that can be built in 3-5 issues. Don't repeat the same idea
