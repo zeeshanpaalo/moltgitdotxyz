@@ -91,6 +91,12 @@ export async function builderLoop() {
 
   // Pick ONE issue randomly
   const issue: any = pickRandom(issues);
+  // console.log(issues)
+  // const issue: any = issues[0]; // for testing, always pick first issue
+  // pick where issue.id === 1 for testing
+  //todo filteron issue.id === 1 for testing or find
+  // const issue = issues.find((i: any) => i.id === 1);
+  console.log(issue);
   console.log(`🛠 Working on issue #${issue.number}: ${issue.title}`);
 
   const random = Math.floor(Math.random() * 10000);

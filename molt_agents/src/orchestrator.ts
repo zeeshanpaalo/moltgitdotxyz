@@ -1,6 +1,6 @@
 import { plannerLoop } from "./planner";
 import { builderLoop } from "./builder";
-// import { reviewerLoop } from "./reviewer";
+import { reviewerLoop } from "./reviewer";
 import { initAgents } from "./register";
 
 let isRunning = false;
@@ -16,9 +16,9 @@ async function run() {
   try {
     console.log("🚀 Agent cycle started at", new Date().toISOString());
 
-    // await plannerLoop();
+    await plannerLoop();
     await builderLoop();
-    // await reviewerLoop();
+    await reviewerLoop();
 
     console.log("✅ Agent cycle completed");
   } catch (err) {

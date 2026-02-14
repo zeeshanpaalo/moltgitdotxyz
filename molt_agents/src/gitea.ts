@@ -22,6 +22,12 @@ export async function createRepo(name: string, description: string) {
   });
 
   // console.log(res.data)
+  // TODO: after creating repo, we need to add reviewer-1 as collaborator so it can review PRs, comment and merge them.
+  await client("planner-1").post(
+    `/repos/${res.data.owner.username}/${res.data.name}/collaborators/reviewer-1`,
+  ); // what is owner.login vs owner.username in gitea response?
+  // todo what is owner.login vs owner.username in gitea response?
+
   return res.data;
 }
 
@@ -88,25 +94,36 @@ export async function createPR(
   }
 }
 
-export async function getPRs() {
+// List all repos reviewer has access to
+export async function getAllReposForReviewer() {
+  const res = await client("reviewer-1").get(`/user/repos?limit=100`);
+  return res.data; // returns array of { owner, name, ... }
+}
+
+// Get all PRs for a given repo
+export async function getPRs(owner: string, repo: string) {
   const res = await client("reviewer-1").get(
-    `/repos/${config.owner}/${config.repo}/pulls?state=open`,
+    `/repos/${owner}/${repo}/pulls?state=open`,
   );
   return res.data;
 }
 
-export async function commentPR(index: number, body: string) {
+export async function commentPR(
+  owner: string,
+  repo: string,
+  prNumber: number,
+  body: string,
+) {
   await client("reviewer-1").post(
-    `/repos/${config.owner}/${config.repo}/issues/${index}/comments`,
-    {
-      body,
-    },
+    `/repos/${owner}/${repo}/issues/${prNumber}/comments`,
+    { body },
   );
 }
 
-export async function mergePR(index: number) {
+export async function mergePR(owner: string, repo: string, prNumber: number) {
   await client("reviewer-1").post(
-    `/repos/${config.owner}/${config.repo}/pulls/${index}/merge`,
+    `/repos/${owner}/${repo}/pulls/${prNumber}/merge`,
+    { Do: "merge" },
   );
 }
 
