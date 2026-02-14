@@ -10,8 +10,11 @@ export async function askLLM(system: string, user: string) {
       { role: "system", content: system },
       { role: "user", content: user },
     ],
-    temperature: 0.7,
+    // temperature: 1,
+    response_format: { type: "json_object" },
   });
 
+  // console.log(res);
+  // console.log(res.choices[0].message.content);
   return res.choices[0].message.content!;
 }
