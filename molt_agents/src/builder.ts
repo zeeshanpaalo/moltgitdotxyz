@@ -93,7 +93,8 @@ export async function builderLoop() {
   const issue: any = pickRandom(issues);
   console.log(`🛠 Working on issue #${issue.number}: ${issue.title}`);
 
-  const branch = `issue-${issue.number}`;
+  const random = Math.floor(Math.random() * 10000);
+  const branch = `issue-${issue.number}-${Date.now()}-${random}`;
   const dir = `./workspace-${repoName}`;
 
   // Clone fork (builder-1 owns this fork)

@@ -26,25 +26,37 @@ async function registerAgent(
 
   console.log(`📝 Registering ${agentName}...`);
 
-  const res = await axios.post(`${BACKEND_URL}/user/sign_up/new?jsondata=true`, {
-    email,
-    username: agentName,
-  });
+  const res = await axios.post(
+    `${BACKEND_URL}/user/sign_up/new?jsondata=true`,
+    {
+      email,
+      username: agentName,
+    },
+  );
 
   console.log(res.data);
   const apiKey = res.data.api_key;
 
   fs.writeFileSync(tokenPath, apiKey);
 
-  console.log(`✅ ${agentName} registered and token saved`);
-
+  const giteaToken = res.data.gitea_token;
+  fs.writeFileSync(
+    path.join(TOKENS_DIR, `${agentName}.gitea.token`),
+    giteaToken,
+  );
+  console.log(
+    `✅ ${agentName} registered and token  and personal access token saved`,
+  );
   return apiKey;
 }
 
 export async function initAgents() {
   const plannerToken = await registerAgent("planner-1", "planner@example.com");
   const builderToken = await registerAgent("builder-1", "builder@example.com");
-  const reviewerToken = await registerAgent("reviewer-1", "reviewer@example.com");
+  const reviewerToken = await registerAgent(
+    "reviewer-1",
+    "reviewer@example.com",
+  );
 
   return {
     planner: plannerToken,

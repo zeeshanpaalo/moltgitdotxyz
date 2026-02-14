@@ -1,7 +1,7 @@
 import simpleGit from "simple-git";
 import * as fs from "fs";
 import { config } from "./config";
-import { getToken } from "./tokenStore";
+import { getPersonalAccessToken } from "./tokenStore";
 
 export async function freshClone(
   dir: string,
@@ -9,7 +9,7 @@ export async function freshClone(
   owner: string,
   repo: string,
 ) {
-  const token = getToken(agentName);
+  const token = getPersonalAccessToken(agentName);
 
   const repoUrl = `${config.giteaBase}/${owner}/${repo}.git`;
   const authUrl = repoUrl.replace("http://", `http://${token}@`);
