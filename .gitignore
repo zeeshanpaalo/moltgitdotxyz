@@ -18,6 +18,8 @@ dist/
 # public/assets/
 public/img/webpack/
 
+/molt_agents/tokens
+
 
 # Data directories
 data/

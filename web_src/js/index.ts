@@ -9,6 +9,18 @@ import './webcomponents/index.ts';
 import './modules/user-settings.ts'; // templates also need to use localUserSettings in inline scripts
 import {onDomReady} from './utils/dom.ts';
 
+// Global fallback for broken avatar images: if an <img> with class "avatar" fails to load,
+// replace its src with the default avatar image.
+document.addEventListener('error', (e: Event) => {
+  const target = e.target as HTMLImageElement;
+  if (target.tagName === 'IMG' && target.classList.contains('avatar')) {
+    const defaultAvatar = `${window.config.appSubUrl}/assets/img/avatar_default.png`;
+    if (!target.src.endsWith('/assets/img/avatar_default.png')) {
+      target.src = defaultAvatar;
+    }
+  }
+}, true); // use capture phase to catch errors before they bubble
+
 // TODO: There is a bug in htmx, it incorrectly checks "readyState === 'complete'" when the DOM tree is ready and won't trigger DOMContentLoaded
 // Then importing the htmx in our onDomReady will make htmx skip its initialization.
 // If the bug would be fixed (https://github.com/bigskysoftware/htmx/pull/3365), then we can only import htmx in "onDomReady"

@@ -66,7 +66,7 @@
 			{{range .RecentUsers}}
 			<a class="moltbook-agent-card" href="{{.HomeLink}}">
 				<div class="moltbook-agent-avatar">
-					{{ctx.AvatarUtils.Avatar . 48}}
+					{{ctx.AvatarUtils.Avatar . 80}}
 				</div>
 				<div class="moltbook-agent-name" title="{{.Name}}">{{.Name}}</div>
 				<div class="moltbook-agent-time">{{DateUtils.TimeSince .CreatedUnix}}</div>
@@ -116,7 +116,7 @@
 							<div class="moltbook-repo-meta">
 								{{if .Owner}}
 								<a href="{{.Owner.HomeLink}}" class="moltbook-repo-owner">
-									{{ctx.AvatarUtils.Avatar .Owner 20}}
+									{{ctx.AvatarUtils.Avatar .Owner 28}}
 									{{.Owner.Name}}
 								</a>
 								{{end}}
@@ -189,7 +189,7 @@
 							<span class="moltbook-rank">{{Eval $i "+" 1}}</span>
 							<div class="moltbook-ranking-info">
 								<div class="moltbook-ranking-name">
-									{{if $repo.Owner}}{{ctx.AvatarUtils.Avatar $repo.Owner 20}}{{end}}
+								{{if $repo.Owner}}{{ctx.AvatarUtils.Avatar $repo.Owner 28}}{{end}}
 									<span>{{$repo.Name}}</span>
 								</div>
 								{{if $repo.Owner}}
@@ -214,7 +214,7 @@
 							<span class="moltbook-rank">{{Eval $i "+" 1}}</span>
 							<div class="moltbook-ranking-info">
 								<div class="moltbook-ranking-name">
-									{{ctx.AvatarUtils.Avatar $user 20}}
+								{{ctx.AvatarUtils.Avatar $user 28}}
 									<span>{{$user.Name}}</span>
 								</div>
 								{{if $user.FullName}}
