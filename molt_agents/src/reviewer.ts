@@ -1,18 +1,183 @@
 import { askLLM } from "./llm";
-import { getPRs, commentPR, mergePR } from "./gitea";
+import {
+  getAllReposForReviewer,
+  getPRs,
+  // isCollaborator,
+  // addCollaborator,
+  commentPR,
+  mergePR,
+} from "./gitea";
+import axios from "axios";
 import { config } from "./config";
+import { getToken } from "./tokenStore";
+
+/**
+ * Extract issue number from branch name.
+ * Expected format: ${builderName}-issue-${issueNumber}
+ * Example: builder-1-issue-3
+ */
+function extractIssueNumber(branch: string): number {
+  const match = branch.match(/-issue-(\d+)$/);
+  return match ? parseInt(match[1], 10) : Number.MAX_SAFE_INTEGER;
+}
+
+async function getPRDetails(owner: string, repo: string, prNumber: number) {
+  const token = getToken("reviewer-1");
+
+  const api = axios.create({
+    baseURL: `${config.giteaBase}/api/v1`,
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const [prRes, filesRes] = await Promise.all([
+    api.get(`/repos/${owner}/${repo}/pulls/${prNumber}`),
+    api.get(`/repos/${owner}/${repo}/pulls/${prNumber}/files`),
+  ]);
+
+  return {
+    pr: prRes.data,
+    files: filesRes.data,
+  };
+}
 
 export async function reviewerLoop() {
-  const prs = await getPRs();
-  if (!prs.length) return;
+  console.log("🔎 Reviewer scanning all repos...");
 
-  const pr = prs[0];
+  const repos = await getAllReposForReviewer();
+  if (!repos.length) {
+    console.log("📭 No repos found for reviewer");
+    return;
+  }
 
-  const review = await askLLM(
-    "You are a senior code reviewer.",
-    "Write a short approval comment for a Todo app PR.",
+  // Collect all PRs across all repos
+  let allPRs: any[] = [];
+  for (const repo of repos) {
+    const prs = await getPRs(repo.owner.login, repo.name);
+
+    for (const pr of prs) {
+      allPRs.push({
+        ...pr,
+        owner: repo.owner.login,
+        repo: repo.name,
+      });
+    }
+  }
+
+  if (!allPRs.length) {
+    console.log("📭 No open PRs found.");
+    return;
+  }
+
+  // Sort PRs by issue number extracted from branch name
+  allPRs.sort((a, b) => {
+    const aNum = extractIssueNumber(a.head.ref);
+    const bNum = extractIssueNumber(b.head.ref);
+    return aNum - bNum;
+  });
+
+  // Pick the earliest PR
+  // lets do pick an PR randomly
+  const randomIndex = Math.floor(Math.random() * allPRs.length);
+  // const pr = allPRs[randomIndex];
+  // pr should be where allPRs.find where number is 6
+  const pr = allPRs.find((p) => p.number === 13);
+  console.log(pr);
+  console.log(
+    `📝 Reviewing PR #${pr.number} from ${pr.owner}/${pr.repo}, branch ${pr.head.ref}`,
+  );
+  // return;
+  const reviewerUsername = "reviewer-1";
+
+  // Ensure reviewer is collaborator
+  // const hasAccess = await isCollaborator(pr.owner, pr.repo, reviewerUsername);
+  // if (!hasAccess) {
+  //   console.log(
+  //     `🔐 Reviewer not collaborator on ${pr.owner}/${pr.repo}. Adding via planner-1...`,
+  //   );
+  //   await addCollaborator(pr.owner, pr.repo, reviewerUsername);
+  // }
+
+  // Fetch PR details and changed files
+  const { pr: prDetails, files } = await getPRDetails(
+    pr.owner,
+    pr.repo,
+    pr.number,
   );
 
-  await commentPR(pr.number, review);
-  await mergePR(pr.id);
+  const diffSummary = files
+    .map(
+      (f: any) =>
+        `File: ${f.filename}\nAdditions: ${f.additions}\nDeletions: ${f.deletions}\nPatch:\n${f.patch || "No patch available"}`,
+    )
+    .join("\n\n");
+
+  // Ask LLM for review with confidence score
+  const reviewResponse = await askLLM(
+    `You are a senior software architect and reviewer.
+Return STRICT JSON:
+{
+  "approve": boolean,
+  "confidence": number, // 0.0 = reject, 1.0 = fully confident to approve
+  "comment": "detailed review feedback"
+}
+
+Instructions:
+- Provide a confidence score for your decision to merge this PR.
+- Approve only if confident; otherwise, reject.
+- Always provide a meaningful comment explaining your reasoning.
+- Confidence should reflect how safe and correct the code looks.
+- Don't worry about test cases and super edge cases, just focus on overall code quality, correctness, and whether it addresses the issue.
+`,
+    `
+Repo: ${pr.owner}/${pr.repo}
+PR Title: ${prDetails.title}
+PR Body: ${prDetails.body}
+
+Changed Files:
+${diffSummary}
+
+Review carefully:
+- Ensure it addresses the issue from branch name.
+- Check architecture, code quality, and correctness.
+- Provide confidence score (0.0-1.0) indicating how confident you are to merge.
+- Approve if safe and mostly correct.
+- Reject if there is a significant problem or unsafe code.
+`,
+  );
+
+  let parsed;
+  try {
+    parsed = JSON.parse(reviewResponse);
+  } catch {
+    console.error("❌ Failed to parse LLM response. Leaving safe comment.");
+    await commentPR(
+      pr.owner,
+      pr.repo,
+      pr.number,
+      "Reviewer failed to parse analysis. Manual review required.",
+    );
+    return;
+  }
+
+  // Comment PR
+  await commentPR(pr.owner, pr.repo, pr.number, parsed.comment);
+  const CONFIDENCE_CUTOFF = 0.5;
+  // Decide merge based on confidence
+  if (parsed.confidence >= CONFIDENCE_CUTOFF) {
+    console.log(
+      `✅ Confidence ${parsed.confidence} >= ${CONFIDENCE_CUTOFF}. Merging PR #${pr.number}`,
+    );
+    await mergePR(pr.owner, pr.repo, pr.number);
+  } else {
+    console.log(
+      `🛑 PR #${pr.number} not merged. Confidence ${parsed.confidence}`,
+    );
+  }
+
+  // if (parsed.approve) {
+  //   console.log(`✅ Merging PR #${pr.number}`);
+  //   await mergePR(pr.owner, pr.repo, pr.number);
+  // } else {
+  //   console.log(`🛑 Changes requested for PR #${pr.number}`);
+  // }
 }

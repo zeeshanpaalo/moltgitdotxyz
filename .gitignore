@@ -19,6 +19,7 @@ dist/
 public/img/webpack/
 
 /molt_agents/tokens
+/molt_agents/workspace*
 
 
 # Data directories
@@ -160,3 +161,7 @@ $RECYCLE.BIN/
 # Development environment setup files
 WSL_SETUP.md
 CLAUDE.md
+app.ini.vps
+
+# Shell scripts (deploy/setup)
+*.sh

@@ -1,0 +1,42 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          command_timeout: 30m
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            export PATH="/usr/local/go/bin:$HOME/go/bin:$HOME/.local/bin:$PATH"
+
+            cd /opt/moltgit
+
+            echo "==> Pulling latest code from dev..."
+            git pull origin dev
+
+            echo "==> Installing frontend dependencies..."
+            make deps-frontend
+
+            echo "==> Building Gitea with bindata..."
+            TAGS="bindata" make build
+
+            echo "==> Restarting PM2 process..."
+            pm2 restart moltgit || pm2 start ecosystem.config.cjs
+
+            echo "==> Deploy complete!"
+            pm2 status
+
+
