@@ -1,7 +1,12 @@
 import * as fs from "fs";
 import * as path from "path";
 import { askLLM } from "./llm";
-import { searchReposWithIssues, getIssuesForRepo, createPR } from "./gitea";
+import {
+  searchReposWithIssues,
+  getIssuesForRepo,
+  createPR,
+  forkRepo,
+} from "./gitea";
 import { freshClone, commitAndPush } from "./git";
 
 /**
@@ -41,7 +46,6 @@ function pickRandom<T>(array: T[]): T {
 export async function builderLoop() {
   console.log("🔍 Searching public repos with open issues...");
 
-  // 1️⃣ Get all public repos that support issues
   const repos: any[] = await searchReposWithIssues();
 
   if (!repos || !repos.length) {
@@ -49,7 +53,7 @@ export async function builderLoop() {
     return;
   }
 
-  // 2️⃣ Filter repos that actually have open issues
+  // Filter repos that actually have open issues
   const reposWithOpenIssues = repos.filter(
     (repo: any) => repo.open_issues_count > 0,
   );
@@ -59,16 +63,25 @@ export async function builderLoop() {
     return;
   }
 
-  // 3️⃣ Randomly pick ONE repo
-  // (If only 1 exists, it will be selected naturally)
+  // Pick ONE repo randomly
   const selectedRepo = pickRandom(reposWithOpenIssues);
-
   const repoOwner = selectedRepo.owner.login;
   const repoName = selectedRepo.name;
 
   console.log(`📦 Selected repo: ${repoOwner}/${repoName}`);
 
-  // 4️⃣ Fetch open issues for selected repo
+  // Fork repo if not owned by builder-1
+  const builderUsername = "builder-1";
+  let forkOwner = builderUsername;
+
+  if (repoOwner !== builderUsername) {
+    console.log(`🍴 Forking repo into ${builderUsername} namespace...`);
+    const fork = await forkRepo(repoOwner, repoName);
+    forkOwner = fork.owner.login;
+    console.log(`✅ Fork created: ${forkOwner}/${repoName}`);
+  }
+
+  // Fetch open issues from original repo
   const issues = await getIssuesForRepo(repoOwner, repoName);
 
   if (!issues || !issues.length) {
@@ -76,29 +89,32 @@ export async function builderLoop() {
     return;
   }
 
-  // 5️⃣ Pick ONE issue randomly
+  // Pick ONE issue randomly
   const issue: any = pickRandom(issues);
-
   console.log(`🛠 Working on issue #${issue.number}: ${issue.title}`);
 
   const branch = `issue-${issue.number}`;
   const dir = `./workspace-${repoName}`;
 
-  // 6️⃣ Clone repo
-  await freshClone(dir, "builder-1", repoOwner, repoName);
+  // Clone fork (builder-1 owns this fork)
+  await freshClone(dir, builderUsername, forkOwner, repoName);
 
-  // 7️⃣ Read entire codebase
+  // Read entire codebase
   const codebase = readCodebase(dir);
-  console.log(codebase)
   const isEmpty = codebase.trim().length === 0;
+  console.log(
+    isEmpty
+      ? "📁 Repository is empty. Will create boilerplate."
+      : "📚 Codebase read successfully.",
+  );
 
-  console.log(isEmpty ? "📁 Repository is empty. Will create boilerplate." : "📚 Codebase read successfully.");
-
-  // 8️⃣ Ask LLM to implement solution
+  // Ask LLM to implement solution
   const system = "You are a senior autonomous software engineer.";
 
   const user = `
-Repository: ${repoOwner}/${repoName}
+Repository: ${forkOwner}/${repoName} (forked)
+
+Original Repository: ${repoOwner}/${repoName}
 
 Issue:
 ${issue.title}
@@ -107,7 +123,7 @@ ${issue.body}
 Current Codebase:
 ${codebase || "EMPTY REPOSITORY"}
 
-If repository is empty:
+If repository does not contain actual source code:
 - Choose appropriate language and framework.
 - Create full project boilerplate.
 
@@ -125,22 +141,20 @@ Return STRICT JSON:
   const output = await askLLM(system, user);
   const parsed = JSON.parse(output);
 
-  // 9️⃣ Write files
+  // Write files
   for (const file of parsed.files) {
     const fullPath = path.join(dir, file.path);
-
-    fs.mkdirSync(path.dirname(fullPath), {
-      recursive: true,
-    });
-
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
     fs.writeFileSync(fullPath, file.content);
   }
 
-  // 🔟 Commit & push
+  // Commit & push branch to fork
   await commitAndPush(dir, branch, parsed.commit_message);
 
-  // 1️⃣1️⃣ Create PR
-  await createPR(repoOwner, repoName, issue.title, branch);
+  // Create PR from fork -> original repo
+  await createPR(repoOwner, repoName, issue.title, branch, forkOwner);
 
-  console.log(`✅ PR created for ${repoOwner}/${repoName}`);
+  console.log(
+    `✅ PR created from ${forkOwner}/${repoName} -> ${repoOwner}/${repoName}`,
+  );
 }
