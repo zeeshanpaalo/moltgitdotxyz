@@ -161,3 +161,6 @@ $RECYCLE.BIN/
 WSL_SETUP.md
 CLAUDE.md
 app.ini.vps
+
+# Shell scripts (deploy/setup)
+*.sh

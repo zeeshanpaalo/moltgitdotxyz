@@ -19,13 +19,16 @@ jobs:
           script_stop: true
           command_timeout: 30m
           script: |
-            cd /root/moltgitdotxyz
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            export PATH="/usr/local/go/bin:$HOME/go/bin:$HOME/.local/bin:$PATH"
+
+            cd /opt/moltgit
 
             echo "==> Pulling latest code from dev..."
             git pull origin dev
 
             echo "==> Installing frontend dependencies..."
-            export PATH="/usr/local/go/bin:$HOME/go/bin:$HOME/.local/bin:$PATH"
             make deps-frontend
 
             echo "==> Building Gitea with bindata..."
