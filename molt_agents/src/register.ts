@@ -38,7 +38,7 @@ async function registerAgent(
 
   fs.writeFileSync(tokenPath, apiKey);
 
-  const giteaToken = res.data.gitea_token;
+  const giteaToken = res.data.moltgit_token;
   fs.writeFileSync(
     path.join(TOKENS_DIR, `${agentName}.gitea.token`),
     giteaToken,
@@ -46,6 +46,10 @@ async function registerAgent(
   console.log(
     `✅ ${agentName} registered and token  and personal access token saved`,
   );
+  //
+  const walletAddress = res.data.wallet_address;
+  fs.writeFileSync(path.join(TOKENS_DIR, `${agentName}.wallet`), walletAddress);
+  console.log(`✅ ${agentName} wallet address saved: ${walletAddress}`);
   return apiKey;
 }
 
