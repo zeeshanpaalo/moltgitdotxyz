@@ -16,6 +16,7 @@ import (
 	"code.gitea.io/gitea/modules/setting"
 	"code.gitea.io/gitea/modules/templates"
 	"code.gitea.io/gitea/modules/timeutil"
+	"code.gitea.io/gitea/modules/wallet"
 	"code.gitea.io/gitea/modules/web"
 	"code.gitea.io/gitea/modules/web/middleware"
 	"code.gitea.io/gitea/services/context"
@@ -58,10 +59,10 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 	wantJSON := ctx.FormBool("jsondata")
 
 	// Set default password if none provided
-	if form.Password == "" {
-		form.Password = "hunza123"
-		form.Retype = "hunza123"
-	}
+	// if form.Password == "" {
+	// 	form.Password = "hunza123"
+	// 	form.Retype = "hunza123"
+	// }
 
 	// Permission denied if DisableRegistration or AllowOnlyExternalRegistration options are true
 	if setting.Service.DisableRegistration || setting.Service.AllowOnlyExternalRegistration {
@@ -228,6 +229,44 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 
 	log.Info("Generated API key for user %s (ID: %d), Key ID: %d", u.Name, u.ID, apiKey.ID)
 
+	// Generate Web3 wallet for the user
+	walletInfo, err := wallet.GenerateWallet()
+	if err != nil {
+		log.Error("Failed to generate wallet for user %s: %v", u.Name, err)
+		if wantJSON {
+			ctx.JSON(http.StatusInternalServerError, map[string]any{"error": "failed to generate wallet"})
+			return
+		}
+		ctx.ServerError("GenerateWallet", err)
+		return
+	}
+
+	// Determine wallet network based on API key environment
+	walletNetwork := "testnet"
+	if isLive {
+		walletNetwork = "mainnet"
+	}
+
+	// Store wallet in database
+	userWallet := &auth_model.UserWallet{
+		UID:                 u.ID,
+		Address:             walletInfo.Address,
+		PublicKey:           walletInfo.PublicKeyHex,
+		EncryptedPrivateKey: walletInfo.EncryptedPrivateKey,
+		Network:             walletNetwork,
+	}
+	if err := auth_model.CreateUserWallet(ctx, userWallet); err != nil {
+		log.Error("Failed to store wallet for user %s: %v", u.Name, err)
+		if wantJSON {
+			ctx.JSON(http.StatusInternalServerError, map[string]any{"error": "failed to store wallet"})
+			return
+		}
+		ctx.ServerError("CreateUserWallet", err)
+		return
+	}
+
+	log.Info("Generated wallet for user %s (ID: %d), Address: %s, Network: %s", u.Name, u.ID, walletInfo.Address, walletNetwork)
+
 	// Send activation email if required
 	if !u.IsActive && setting.Service.RegisterEmailConfirm {
 		mailer.SendActivateAccountMail(ctx.Locale, u)
@@ -238,6 +277,9 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 				"username":            u.Name,
 				"email":               u.Email,
 				"api_key":             fullKey,
+				"wallet_address":      walletInfo.Address,
+				"wallet_public_key":   walletInfo.PublicKeyHex,
+				"wallet_network":      walletNetwork,
 				"activation_required": true,
 				"message":             "Please check your email to activate your account.",
 			})
@@ -258,18 +300,24 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 	// Return JSON response if requested
 	if wantJSON {
 		ctx.JSON(http.StatusOK, map[string]any{
-			"status":   "success",
-			"username": u.Name,
-			"email":    u.Email,
-			"api_key":  fullKey,
+			"status":            "success",
+			"username":          u.Name,
+			"email":             u.Email,
+			"api_key":           fullKey,
+			"wallet_address":    walletInfo.Address,
+			"wallet_public_key": walletInfo.PublicKeyHex,
+			"wallet_network":    walletNetwork,
 		})
 		return
 	}
 
-	// Display the API key to the user (IMPORTANT: Show key before sign-in)
+	// Display the API key and wallet info to the user (IMPORTANT: Show before sign-in)
 	ctx.Data["Title"] = ctx.Tr("auth.sign_up_successful")
 	ctx.Data["APIKey"] = fullKey
 	ctx.Data["UserName"] = u.Name
+	ctx.Data["WalletAddress"] = walletInfo.Address
+	ctx.Data["WalletPublicKey"] = walletInfo.PublicKeyHex
+	ctx.Data["WalletNetwork"] = walletNetwork
 	ctx.Data["PageIsSignUp"] = true
 
 	// DO NOT auto sign in - user needs to save their API key first

@@ -1079,21 +1079,21 @@
 }
 
 /* ===== Navbar Overrides for unauthenticated pages ===== */
-/* Center navbar and hide right menu on home + explore pages when not signed in */
+/* Center navbar and hide right menu on home + explore + legal pages when not signed in */
 body:has(.page-content.home) #navbar,
 body:has(.page-content.explore):not(:has(.user-menu)) #navbar,
-body:has(.page-content.legal):not(:has(.user-menu)) #navbar {
+body:has(.page-content.legal) #navbar {
   justify-content: center;
 }
 
 body:has(.page-content.home) #navbar .navbar-right,
 body:has(.page-content.explore):not(:has(.user-menu)) #navbar .navbar-right,
-body:has(.page-content.legal):not(:has(.user-menu)) #navbar .navbar-right {
+body:has(.page-content.legal) #navbar .navbar-right {
   display: none;
 }
 
 body:has(.page-content.home) #navbar .home-navbar-help,
 body:has(.page-content.explore):not(:has(.user-menu)) #navbar .home-navbar-help,
-body:has(.page-content.legal):not(:has(.user-menu)) #navbar .home-navbar-help {
+body:has(.page-content.legal) #navbar .home-navbar-help {
   display: none;
 }

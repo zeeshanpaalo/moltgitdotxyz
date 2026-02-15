@@ -402,6 +402,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(325, "Fix missed repo_id when migrate attachments", v1_26.FixMissedRepoIDWhenMigrateAttachments),
 		newMigration(326, "Add user API key table", v1_26.AddUserAPIKeyTable),
 		newMigration(327, "Add auth type to user table", v1_26.AddAuthTypeToUser),
+		newMigration(328, "Add user wallet table", v1_26.AddUserWalletTable),
 	}
 	return preparedMigrations
 }
