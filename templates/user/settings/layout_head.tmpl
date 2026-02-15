@@ -1,7 +1,14 @@
 {{template "base/head" .ctxData}}
 <div role="main" aria-label="{{.ctxData.Title}}" class="page-content {{.pageClass}}">
 	<div class="ui container flex-container">
-		{{template "user/settings/navbar" .ctxData}}
+		<div class="flex-container-nav">
+			{{template "user/settings/navbar" .ctxData}}
+			<div class="ui fluid vertical menu">
+				<a class="{{if .ctxData.PageIsSettingsWallet}}active {{end}}item" href="{{AppSubUrl}}/user/settings/wallet">
+					{{svg "octicon-key" 16 "tw-mr-1"}} {{ctx.Locale.Tr "settings.wallet"}}
+				</a>
+			</div>
+		</div>
 		<div class="flex-container-main">
 			{{template "base/alert" .ctxData}}
 			{{/* block: user-setting-content */}}

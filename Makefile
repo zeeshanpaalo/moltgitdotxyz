@@ -397,6 +397,11 @@ lint-json: node_modules ## lint json files
 lint-json-fix: node_modules ## lint and fix json files
 	$(NODE_VARS) pnpm exec eslint -c eslint.json.config.ts --color --max-warnings=0 --fix
 
+.PHONY: stop
+stop: ## stop Gitea and release port 3000
+	@pid=$$(lsof -ti :3000 2>/dev/null); \
+	if [ -n "$$pid" ]; then kill $$pid 2>/dev/null && echo "Stopped process $$pid on port 3000"; else echo "Nothing listening on port 3000"; fi
+
 .PHONY: watch
 watch: ## watch everything and continuously rebuild
 	@bash tools/watch.sh
@@ -727,6 +732,11 @@ frontend: $(WEBPACK_DEST) ## build frontend files
 .PHONY: backend
 backend: generate-backend $(EXECUTABLE) ## build backend files
 
+.PHONY: build-bindata
+build-bindata: ## build with embedded templates (ensures Wallet and latest UI show)
+	$(MAKE) generate TAGS=bindata
+	$(MAKE) build TAGS=bindata
+
 # We generate the backend before the frontend in case we in future we want to generate things in the frontend from generated files in backend
 .PHONY: generate
 generate: generate-backend ## run "go generate"
@@ -743,7 +753,12 @@ generate-go: $(TAGS_PREREQ)
 security-check:
 	GOEXPERIMENT= go run $(GOVULNCHECK_PACKAGE) -show color ./...
 
+# When using bindata, binary must be rebuilt after go generate updates embedded templates
+ifneq (,$(findstring bindata,$(TAGS)))
+$(EXECUTABLE): $(GO_SOURCES) $(TAGS_PREREQ) modules/templates/bindata.dat
+else
 $(EXECUTABLE): $(GO_SOURCES) $(TAGS_PREREQ)
+endif
 ifneq ($(and $(STATIC),$(findstring pam,$(TAGS))),)
   $(error pam support set via TAGS does not support static builds)
 endif

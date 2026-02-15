@@ -1,0 +1,153 @@
+{{template "user/settings/layout_head" (dict "ctxData" . "pageClass" "user settings wallet")}}
+	<div class="user-setting-content">
+		<h4 class="ui top attached header">
+			{{svg "octicon-key" 16 "tw-mr-1"}} {{ctx.Locale.Tr "settings.wallet"}}
+		</h4>
+		<div class="ui attached segment">
+			<p>{{ctx.Locale.Tr "settings.wallet_info"}}</p>
+		</div>
+		{{if .Wallets}}
+			{{range $i, $w := .Wallets}}
+			<div class="ui attached segment">
+				<div class="field tw-mb-4">
+					<label>{{ctx.Locale.Tr "settings.wallet_public_key"}}</label>
+					<div class="ui action input tw-w-full">
+						<input type="text" value="{{$w.PublicKey}}" readonly>
+						<button class="ui basic button copy-btn" type="button" data-clipboard-text="{{$w.PublicKey}}">
+							{{svg "octicon-copy" 16}} {{ctx.Locale.Tr "copy"}}
+						</button>
+					</div>
+				</div>
+				<div class="field tw-mb-4">
+					<label>{{ctx.Locale.Tr "settings.wallet_address"}}</label>
+					<div class="ui action input tw-w-full">
+						<input type="text" value="{{$w.Address}}" readonly>
+						<button class="ui basic button copy-btn" type="button" data-clipboard-text="{{$w.Address}}">
+							{{svg "octicon-copy" 16}} {{ctx.Locale.Tr "copy"}}
+						</button>
+					</div>
+				</div>
+				{{$privKey := index $.WalletPrivateKeys $i}}
+				{{if $privKey}}
+				<div class="field tw-mb-4 wallet-private-key-field" data-private-key="{{$privKey}}">
+					<label>{{ctx.Locale.Tr "settings.wallet_private_key"}}</label>
+					<div class="ui action input tw-w-full">
+						<input type="text" class="wallet-private-key-input" readonly value="" placeholder="••••••••••••••••••••••••••••••••">
+						<button class="ui basic button wallet-private-key-toggle" type="button">{{ctx.Locale.Tr "settings.wallet_show"}}</button>
+						<button class="ui basic button copy-btn wallet-private-key-copy" type="button" data-clipboard-text="{{$privKey}}">
+							{{svg "octicon-copy" 16}} {{ctx.Locale.Tr "copy"}}
+						</button>
+					</div>
+				</div>
+				{{end}}
+				<div class="field">
+					<label>{{ctx.Locale.Tr "settings.wallet_network"}}</label>
+					<div class="ui input tw-w-full">
+						<input type="text" value="{{$w.Network}}" readonly>
+					</div>
+				</div>
+			</div>
+			{{end}}
+		{{else}}
+			<div class="ui attached segment">
+				<p>No wallet found for your account.</p>
+			</div>
+		{{end}}
+
+		<h4 class="ui top attached header tw-mt-4">
+			{{svg "octicon-package" 16 "tw-mr-1"}} {{ctx.Locale.Tr "settings.wallet_nfts"}}
+		</h4>
+		<div class="ui attached segment">
+			<p>{{ctx.Locale.Tr "settings.wallet_nfts_info"}}</p>
+		</div>
+		{{if .NFTs}}
+			<div class="ui attached segment">
+				<table class="ui very basic striped table">
+					<thead>
+						<tr>
+							<th>{{ctx.Locale.Tr "settings.wallet_nft_contract"}}</th>
+							<th>{{ctx.Locale.Tr "settings.wallet_nft_token_id"}}</th>
+							<th>{{ctx.Locale.Tr "settings.wallet_nft_tx_hash"}}</th>
+							<th>{{ctx.Locale.Tr "settings.wallet_nft_chain_id"}}</th>
+							<th>{{ctx.Locale.Tr "settings.wallet_nft_status"}}</th>
+							<th>{{ctx.Locale.Tr "settings.wallet_nft_minted_at"}}</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{range .NFTs}}
+						<tr>
+							<td>
+								<div class="ui small input">
+									<code class="tw-text-xs" title="{{.ContractAddress}}">{{ShortSha .ContractAddress}}</code>
+								</div>
+							</td>
+							<td>
+								{{if eq .TokenID -1}}
+									<span class="ui text grey">—</span>
+								{{else}}
+									{{.TokenID}}
+								{{end}}
+							</td>
+							<td>
+								{{if .TxHash}}
+									<code class="tw-text-xs" title="{{.TxHash}}">{{ShortSha .TxHash}}</code>
+								{{else}}
+									<span class="ui text grey">—</span>
+								{{end}}
+							</td>
+							<td>{{.ChainID}}</td>
+							<td>
+								{{if eq .Status "minted"}}
+									<span class="ui green label">{{.Status}}</span>
+								{{else if eq .Status "pending"}}
+									<span class="ui yellow label">{{.Status}}</span>
+								{{else if eq .Status "failed"}}
+									<span class="ui red label" {{if .ErrorMsg}}title="{{.ErrorMsg}}"{{end}}>{{.Status}}</span>
+								{{else}}
+									<span class="ui label">{{.Status}}</span>
+								{{end}}
+							</td>
+							<td>{{DateUtils.AbsoluteShort .CreatedUnix}}</td>
+						</tr>
+						{{end}}
+					</tbody>
+				</table>
+			</div>
+		{{else}}
+			<div class="ui attached segment">
+				<p>{{ctx.Locale.Tr "settings.wallet_no_nfts"}}</p>
+			</div>
+		{{end}}
+	</div>
+
+<script>
+document.querySelectorAll('.copy-btn').forEach(function(btn) {
+	btn.addEventListener('click', function() {
+		const text = this.getAttribute('data-clipboard-text');
+		navigator.clipboard.writeText(text);
+		const orig = this.innerHTML;
+		this.innerHTML = '{{svg "octicon-check" 16}} {{ctx.Locale.Tr "copy_success"}}';
+		this.classList.add('green');
+		const el = this;
+		setTimeout(function() { el.innerHTML = orig; el.classList.remove('green'); }, 2000);
+	});
+});
+document.querySelectorAll('.wallet-private-key-toggle').forEach(function(btn) {
+	btn.addEventListener('click', function() {
+		const field = this.closest('.wallet-private-key-field');
+		const input = field.querySelector('.wallet-private-key-input');
+		const key = field.getAttribute('data-private-key');
+		if (input.value !== key) {
+			input.value = key;
+			input.placeholder = '';
+			this.textContent = '{{ctx.Locale.Tr "settings.wallet_hide"}}';
+		} else {
+			input.value = '';
+			input.placeholder = '••••••••••••••••••••••••••••••••';
+			this.textContent = '{{ctx.Locale.Tr "settings.wallet_show"}}';
+		}
+	});
+});
+</script>
+
+{{template "user/settings/layout_footer" .}}

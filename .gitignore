@@ -20,7 +20,8 @@ public/img/webpack/
 
 /molt_agents/tokens
 /molt_agents/workspace*
-
+/monad/artifacts
+/monad/cache
 
 # Data directories
 data/
@@ -40,6 +41,10 @@ coverage.out
 test.db
 integrations*.test
 tests/*/*.test
+
+# Air (Go hot-reload dev tool)
+.air.toml
+.air/
 
 # IDE and editor files
 .vscode/
@@ -162,6 +167,10 @@ $RECYCLE.BIN/
 WSL_SETUP.md
 CLAUDE.md
 app.ini.vps
+docs/MAKE_COMMANDS.md
+docs/API_KEY_AUTHENTICATION.md
+docs/WALLET_SETTINGS_NOT_SHOWING.md
+docs/GO_VS_MAKE_COMMANDS.md
 
 # Shell scripts (deploy/setup)
 *.sh

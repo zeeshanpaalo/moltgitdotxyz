@@ -11,11 +11,13 @@ import (
 	"code.gitea.io/gitea/models/db"
 	user_model "code.gitea.io/gitea/models/user"
 	"code.gitea.io/gitea/modules/auth/password"
+	"code.gitea.io/gitea/modules/blockchain"
 	"code.gitea.io/gitea/modules/log"
 	"code.gitea.io/gitea/modules/session"
 	"code.gitea.io/gitea/modules/setting"
 	"code.gitea.io/gitea/modules/templates"
 	"code.gitea.io/gitea/modules/timeutil"
+	"code.gitea.io/gitea/modules/wallet"
 	"code.gitea.io/gitea/modules/web"
 	"code.gitea.io/gitea/modules/web/middleware"
 	"code.gitea.io/gitea/services/context"
@@ -58,10 +60,10 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 	wantJSON := ctx.FormBool("jsondata")
 
 	// Set default password if none provided
-	if form.Password == "" {
-		form.Password = "hunza123"
-		form.Retype = "hunza123"
-	}
+	// if form.Password == "" {
+	// 	form.Password = "hunza123"
+	// 	form.Retype = "hunza123"
+	// }
 
 	// Permission denied if DisableRegistration or AllowOnlyExternalRegistration options are true
 	if setting.Service.DisableRegistration || setting.Service.AllowOnlyExternalRegistration {
@@ -228,19 +230,65 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 
 	log.Info("Generated API key for user %s (ID: %d), Key ID: %d", u.Name, u.ID, apiKey.ID)
 
+	// Generate Web3 wallet for the user
+	walletInfo, err := wallet.GenerateWallet()
+	if err != nil {
+		log.Error("Failed to generate wallet for user %s: %v", u.Name, err)
+		if wantJSON {
+			ctx.JSON(http.StatusInternalServerError, map[string]any{"error": "failed to generate wallet"})
+			return
+		}
+		ctx.ServerError("GenerateWallet", err)
+		return
+	}
+
+	// Determine wallet network based on API key environment
+	walletNetwork := "testnet"
+	if isLive {
+		walletNetwork = "mainnet"
+	}
+
+	// Store wallet in database
+	userWallet := &auth_model.UserWallet{
+		UID:                 u.ID,
+		Address:             walletInfo.Address,
+		PublicKey:           walletInfo.PublicKeyHex,
+		EncryptedPrivateKey: walletInfo.EncryptedPrivateKey,
+		Network:             walletNetwork,
+	}
+	if err := auth_model.CreateUserWallet(ctx, userWallet); err != nil {
+		log.Error("Failed to store wallet for user %s: %v", u.Name, err)
+		if wantJSON {
+			ctx.JSON(http.StatusInternalServerError, map[string]any{"error": "failed to store wallet"})
+			return
+		}
+		ctx.ServerError("CreateUserWallet", err)
+		return
+	}
+
+	log.Info("Generated wallet for user %s (ID: %d), Address: %s, Network: %s", u.Name, u.ID, walletInfo.Address, walletNetwork)
+
+	// Mint NFT to the user's wallet if blockchain is enabled
+	nftMintResult := mintNFTForUser(ctx, u, walletInfo.Address)
+
 	// Send activation email if required
 	if !u.IsActive && setting.Service.RegisterEmailConfirm {
 		mailer.SendActivateAccountMail(ctx.Locale, u)
 
 		if wantJSON {
-			ctx.JSON(http.StatusOK, map[string]any{
+			respData := map[string]any{
 				"status":              "activation_required",
 				"username":            u.Name,
 				"email":               u.Email,
 				"api_key":             fullKey,
+				"wallet_address":      walletInfo.Address,
+				"wallet_public_key":   walletInfo.PublicKeyHex,
+				"wallet_network":      walletNetwork,
 				"activation_required": true,
 				"message":             "Please check your email to activate your account.",
-			})
+			}
+			addNFTResultToResponse(respData, nftMintResult)
+			ctx.JSON(http.StatusOK, respData)
 			return
 		}
 
@@ -257,20 +305,33 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 
 	// Return JSON response if requested
 	if wantJSON {
-		ctx.JSON(http.StatusOK, map[string]any{
-			"status":   "success",
-			"username": u.Name,
-			"email":    u.Email,
-			"api_key":  fullKey,
-		})
+		respData := map[string]any{
+			"status":            "success",
+			"username":          u.Name,
+			"email":             u.Email,
+			"api_key":           fullKey,
+			"wallet_address":    walletInfo.Address,
+			"wallet_public_key": walletInfo.PublicKeyHex,
+			"wallet_network":    walletNetwork,
+		}
+		addNFTResultToResponse(respData, nftMintResult)
+		ctx.JSON(http.StatusOK, respData)
 		return
 	}
 
-	// Display the API key to the user (IMPORTANT: Show key before sign-in)
+	// Display the API key and wallet info to the user (IMPORTANT: Show before sign-in)
 	ctx.Data["Title"] = ctx.Tr("auth.sign_up_successful")
 	ctx.Data["APIKey"] = fullKey
 	ctx.Data["UserName"] = u.Name
+	ctx.Data["WalletAddress"] = walletInfo.Address
+	ctx.Data["WalletPublicKey"] = walletInfo.PublicKeyHex
+	ctx.Data["WalletNetwork"] = walletNetwork
 	ctx.Data["PageIsSignUp"] = true
+	if nftMintResult != nil {
+		ctx.Data["NFTMinted"] = nftMintResult.Success
+		ctx.Data["NFTTxHash"] = nftMintResult.TxHash
+		ctx.Data["NFTTokenID"] = nftMintResult.TokenID
+	}
 
 	// DO NOT auto sign in - user needs to save their API key first
 	ctx.HTML(http.StatusOK, tplSignUpAPIKeySuccess)
@@ -379,4 +440,90 @@ func handleAPIKeySignIn(ctx *context.Context, u *user_model.User, apiKey string)
 
 	// Redirect to redirect_to or home page
 	redirectAfterAuth(ctx)
+}
+
+// mintNFTForUser attempts to mint an NFT to the user's wallet address.
+// It creates a pending record in the database, attempts the mint, and updates the record.
+// Returns the mint result or nil if blockchain is not enabled.
+func mintNFTForUser(ctx *context.Context, u *user_model.User, walletAddress string) *blockchain.MintResult {
+	if !blockchain.IsEnabled() {
+		log.Info("Blockchain: NFT minting skipped for user %s (blockchain not enabled)", u.Name)
+		return nil
+	}
+
+	contractAddr := setting.Service.Blockchain.ContractAddress
+	chainID := setting.Service.Blockchain.ChainID
+
+	// Check if user already has an NFT for this contract
+	hasNFT, err := auth_model.HasUserNFTForContract(ctx, u.ID, contractAddr)
+	if err != nil {
+		log.Error("Blockchain: Failed to check existing NFT for user %s: %v", u.Name, err)
+	}
+	if hasNFT {
+		log.Info("Blockchain: User %s already has an NFT for contract %s, skipping", u.Name, contractAddr)
+		return nil
+	}
+
+	// Create a pending NFT record
+	nftRecord := &auth_model.UserNFT{
+		UID:             u.ID,
+		WalletAddress:   walletAddress,
+		ContractAddress: contractAddr,
+		TokenID:         -1,
+		ChainID:         chainID,
+		Status:          auth_model.NFTStatusPending,
+	}
+	if err := auth_model.CreateUserNFT(ctx, nftRecord); err != nil {
+		log.Error("Blockchain: Failed to create pending NFT record for user %s: %v", u.Name, err)
+		return nil
+	}
+
+	log.Info("Blockchain: Attempting to mint NFT for user %s to wallet %s", u.Name, walletAddress)
+
+	// Attempt the mint
+	result, err := blockchain.MintNFT(ctx, walletAddress)
+	if err != nil {
+		log.Error("Blockchain: Failed to mint NFT for user %s: %v", u.Name, err)
+		nftRecord.Status = auth_model.NFTStatusFailed
+		nftRecord.ErrorMsg = err.Error()
+		if updateErr := auth_model.UpdateUserNFT(ctx, nftRecord); updateErr != nil {
+			log.Error("Blockchain: Failed to update NFT record for user %s: %v", u.Name, updateErr)
+		}
+		return result
+	}
+
+	// Update the NFT record with the result
+	if result.Success {
+		nftRecord.Status = auth_model.NFTStatusMinted
+		nftRecord.TxHash = result.TxHash
+		nftRecord.TokenID = result.TokenID
+		log.Info("Blockchain: NFT minted successfully for user %s! TX: %s, TokenID: %d", u.Name, result.TxHash, result.TokenID)
+	} else {
+		nftRecord.Status = auth_model.NFTStatusFailed
+		nftRecord.TxHash = result.TxHash
+		if result.Error != nil {
+			nftRecord.ErrorMsg = result.Error.Error()
+		}
+		log.Warn("Blockchain: NFT mint transaction failed for user %s: TX: %s, Error: %v", u.Name, result.TxHash, result.Error)
+	}
+
+	if updateErr := auth_model.UpdateUserNFT(ctx, nftRecord); updateErr != nil {
+		log.Error("Blockchain: Failed to update NFT record for user %s: %v", u.Name, updateErr)
+	}
+
+	return result
+}
+
+// addNFTResultToResponse adds NFT mint result fields to a JSON response map.
+func addNFTResultToResponse(resp map[string]any, result *blockchain.MintResult) {
+	if result == nil {
+		resp["nft_minted"] = false
+		return
+	}
+	resp["nft_minted"] = result.Success
+	resp["nft_tx_hash"] = result.TxHash
+	resp["nft_token_id"] = result.TokenID
+	if result.Error != nil {
+		resp["nft_error"] = result.Error.Error()
+	}
 }

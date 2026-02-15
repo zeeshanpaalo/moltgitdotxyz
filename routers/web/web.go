@@ -644,6 +644,9 @@ func registerWebRoutes(m *web.Router) {
 			m.Post("/delete", user_setting.DeleteAPIKey)
 		})
 
+		// Wallet
+		m.Get("/wallet", user_setting.Wallet)
+
 		m.Combo("/keys").Get(user_setting.Keys).
 			Post(web.Bind(forms.AddKeyForm{}), user_setting.KeysPost)
 		m.Post("/keys/delete", user_setting.DeleteKey)
