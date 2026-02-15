@@ -60,11 +60,20 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 	wantJSON := ctx.FormBool("jsondata")
 
 	// For JSON API requests: if no password provided, use default from app.ini
-	// and skip all password validation
-	if wantJSON {
-		if form.Password == "" && setting.Service.DefaultUserPassword != "" {
+	// or generate a secure random password
+	if wantJSON && form.Password == "" {
+		if setting.Service.DefaultUserPassword != "" {
 			form.Password = setting.Service.DefaultUserPassword
 			form.Retype = setting.Service.DefaultUserPassword
+		} else {
+			// Generate a secure random password (16 chars: letters + digits + symbols)
+			randomPass, err := password.Generate(16)
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, map[string]any{"error": "failed to generate password"})
+				return
+			}
+			form.Password = randomPass
+			form.Retype = randomPass
 		}
 	}
 
