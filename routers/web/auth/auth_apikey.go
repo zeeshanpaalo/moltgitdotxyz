@@ -59,10 +59,13 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 
 	wantJSON := ctx.FormBool("jsondata")
 
-	// Set default password if none provided and a default is configured
-	if form.Password == "" && setting.Service.DefaultUserPassword != "" {
-		form.Password = setting.Service.DefaultUserPassword
-		form.Retype = setting.Service.DefaultUserPassword
+	// For JSON API requests: if no password provided, use default from app.ini
+	// and skip all password validation
+	if wantJSON {
+		if form.Password == "" && setting.Service.DefaultUserPassword != "" {
+			form.Password = setting.Service.DefaultUserPassword
+			form.Retype = setting.Service.DefaultUserPassword
+		}
 	}
 
 	// Permission denied if DisableRegistration or AllowOnlyExternalRegistration options are true
@@ -100,46 +103,33 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 		return
 	}
 
-	if form.Password != form.Retype {
-		if wantJSON {
-			ctx.JSON(http.StatusBadRequest, map[string]any{"error": ctx.Tr("form.password_not_match")})
+	// Password validation only for form submissions (not JSON API)
+	if !wantJSON {
+		if form.Password != form.Retype {
+			ctx.Data["Err_Password"] = true
+			ctx.RenderWithErr(ctx.Tr("form.password_not_match"), tplSignUpAPIKey, &form)
 			return
 		}
-		ctx.Data["Err_Password"] = true
-		ctx.RenderWithErr(ctx.Tr("form.password_not_match"), tplSignUpAPIKey, &form)
-		return
-	}
-	if len(form.Password) < setting.MinPasswordLength {
-		if wantJSON {
-			ctx.JSON(http.StatusBadRequest, map[string]any{"error": ctx.Tr("auth.password_too_short", setting.MinPasswordLength)})
+		if len(form.Password) < setting.MinPasswordLength {
+			ctx.Data["Err_Password"] = true
+			ctx.RenderWithErr(ctx.Tr("auth.password_too_short", setting.MinPasswordLength), tplSignUpAPIKey, &form)
 			return
 		}
-		ctx.Data["Err_Password"] = true
-		ctx.RenderWithErr(ctx.Tr("auth.password_too_short", setting.MinPasswordLength), tplSignUpAPIKey, &form)
-		return
-	}
-	if !password.IsComplexEnough(form.Password) {
-		if wantJSON {
-			ctx.JSON(http.StatusBadRequest, map[string]any{"error": password.BuildComplexityError(ctx.Locale)})
+		if !password.IsComplexEnough(form.Password) {
+			ctx.Data["Err_Password"] = true
+			ctx.RenderWithErr(password.BuildComplexityError(ctx.Locale), tplSignUpAPIKey, &form)
 			return
 		}
-		ctx.Data["Err_Password"] = true
-		ctx.RenderWithErr(password.BuildComplexityError(ctx.Locale), tplSignUpAPIKey, &form)
-		return
-	}
-	if err := password.IsPwned(ctx, form.Password); err != nil {
-		errMsg := ctx.Tr("auth.password_pwned", "https://haveibeenpwned.com/Passwords")
-		if password.IsErrIsPwnedRequest(err) {
-			log.Error(err.Error())
-			errMsg = ctx.Tr("auth.password_pwned_err")
-		}
-		if wantJSON {
-			ctx.JSON(http.StatusBadRequest, map[string]any{"error": errMsg})
+		if err := password.IsPwned(ctx, form.Password); err != nil {
+			errMsg := ctx.Tr("auth.password_pwned", "https://haveibeenpwned.com/Passwords")
+			if password.IsErrIsPwnedRequest(err) {
+				log.Error(err.Error())
+				errMsg = ctx.Tr("auth.password_pwned_err")
+			}
+			ctx.Data["Err_Password"] = true
+			ctx.RenderWithErr(errMsg, tplSignUpAPIKey, &form)
 			return
 		}
-		ctx.Data["Err_Password"] = true
-		ctx.RenderWithErr(errMsg, tplSignUpAPIKey, &form)
-		return
 	}
 
 	u := &user_model.User{
