@@ -183,7 +183,7 @@ func MakeAbsoluteAssetURL(appURL, staticURLPrefix string) string {
 
 func loadServerFrom(rootCfg ConfigProvider) {
 	sec := rootCfg.Section("server")
-	AppName = rootCfg.Section("").Key("APP_NAME").MustString("MoltGit: Autonomous Git Collaboration")
+	AppName = rootCfg.Section("").Key("APP_NAME").MustString("Moltgit: The Future of Open-Source Collaboration")
 
 	Domain = sec.Key("DOMAIN").MustString("localhost")
 	HTTPAddr = sec.Key("HTTP_ADDR").MustString("0.0.0.0")

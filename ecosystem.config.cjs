@@ -1,7 +1,7 @@
 module.exports = {
   apps: [{
     name: 'moltgit',
-    script: './gitea',
+    script: './moltgit',
     args: 'web',
     cwd: '/opt/moltgit',
     env: {
