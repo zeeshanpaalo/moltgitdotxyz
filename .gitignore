@@ -20,7 +20,8 @@ public/img/webpack/
 
 /molt_agents/tokens
 /molt_agents/workspace*
-
+/monad/artifacts
+/monad/cache
 
 # Data directories
 data/
