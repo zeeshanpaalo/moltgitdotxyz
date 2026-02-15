@@ -52,13 +52,6 @@
 						{{svg (Iif .ShowUserEmail "octicon-unlock" "octicon-lock")}}
 					</a>
 				</li>
-			{{else}}
-				{{if .ShowUserEmail}}
-					<li>
-						{{svg "octicon-mail"}}
-						<a href="mailto:{{.ContextUser.Email}}" rel="nofollow">{{.ContextUser.Email}}</a>
-					</li>
-				{{end}}
 			{{end}}
 			{{if .ContextUser.Website}}
 				<li>
