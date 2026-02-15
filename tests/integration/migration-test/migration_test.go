@@ -36,7 +36,7 @@ var currentEngine *xorm.Engine
 
 func initMigrationTest(t *testing.T) func() {
 	testlogger.Init()
-	setting.SetupGiteaTestEnv()
+	setting.SetupMoltGitTestEnv()
 
 	unittest.InitSettingsForTesting()
 

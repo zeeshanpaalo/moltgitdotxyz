@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	EnvConfigKeyPrefixGitea = "GITEA__"
+	EnvConfigKeyPrefixMoltGit = "MOLTGIT__"
 	EnvConfigKeySuffixFile  = "__FILE"
 )
 
@@ -24,7 +24,7 @@ var escapeRegex = regexp.MustCompile(escapeRegexpString)
 
 func CollectEnvConfigKeys() (keys []string) {
 	for _, env := range os.Environ() {
-		if strings.HasPrefix(env, EnvConfigKeyPrefixGitea) {
+		if strings.HasPrefix(env, EnvConfigKeyPrefixMoltGit) {
 			k, _, _ := strings.Cut(env, "=")
 			keys = append(keys, k)
 		}
@@ -96,16 +96,16 @@ func decodeEnvSectionKey(encoded string) (ok bool, section, key string) {
 }
 
 // decodeEnvironmentKey decode the environment key to section and key
-// The environment key is in the form of GITEA__SECTION__KEY or GITEA__SECTION__KEY__FILE
-func decodeEnvironmentKey(prefixGitea, suffixFile, envKey string) (ok bool, section, key string, useFileValue bool) {
-	if !strings.HasPrefix(envKey, prefixGitea) {
+// The environment key is in the form of MOLTGIT__SECTION__KEY or MOLTGIT__SECTION__KEY__FILE
+func decodeEnvironmentKey(prefixMoltGit, suffixFile, envKey string) (ok bool, section, key string, useFileValue bool) {
+	if !strings.HasPrefix(envKey, prefixMoltGit) {
 		return false, "", "", false
 	}
 	if strings.HasSuffix(envKey, suffixFile) {
 		useFileValue = true
 		envKey = envKey[:len(envKey)-len(suffixFile)]
 	}
-	ok, section, key = decodeEnvSectionKey(envKey[len(prefixGitea):])
+	ok, section, key = decodeEnvSectionKey(envKey[len(prefixMoltGit):])
 	return ok, section, key, useFileValue
 }
 
@@ -119,7 +119,7 @@ func EnvironmentToConfig(cfg ConfigProvider, envs []string) (changed bool) {
 		// parse the environment variable to config section name and key name
 		envKey := before
 		envValue := after
-		ok, sectionName, keyName, useFileValue := decodeEnvironmentKey(EnvConfigKeyPrefixGitea, EnvConfigKeySuffixFile, envKey)
+		ok, sectionName, keyName, useFileValue := decodeEnvironmentKey(EnvConfigKeyPrefixMoltGit, EnvConfigKeySuffixFile, envKey)
 		if !ok {
 			continue
 		}
@@ -168,11 +168,11 @@ func EnvironmentToConfig(cfg ConfigProvider, envs []string) (changed bool) {
 }
 
 func UnsetUnnecessaryEnvVars() {
-	// Ideally Gitea should only accept the environment variables which it clearly knows instead of unsetting the ones it doesn't want,
+	// Ideally MoltGit should only accept the environment variables which it clearly knows instead of unsetting the ones it doesn't want,
 	// but the ideal behavior would be a breaking change, and it seems not bringing enough benefits to end users.
 	// So at the moment we just keep "unsetting the unnecessary environment variables".
 
-	// HOME is managed by Gitea, Gitea's git should use "HOME/.gitconfig".
+	// HOME is managed by MoltGit, MoltGit's git should use "HOME/.gitconfig".
 	// But git would try "XDG_CONFIG_HOME/git/config" first if "HOME/.gitconfig" does not exist,
 	// then our git.InitFull would still write to "XDG_CONFIG_HOME/git/config" if XDG_CONFIG_HOME is set.
 	_ = os.Unsetenv("XDG_CONFIG_HOME")

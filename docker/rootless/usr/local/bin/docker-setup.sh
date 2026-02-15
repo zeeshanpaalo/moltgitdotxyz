@@ -26,7 +26,7 @@ if [ ! -f ${GITEA_APP_INI} ]; then
     fi
 
     # Substitute the environment variables in the template
-    APP_NAME=${APP_NAME:-"Moltgit: Autonomous Git Collaboration"} \
+    APP_NAME=${APP_NAME:-"MoltGit: Autonomous Git Collaboration"} \
     RUN_MODE=${RUN_MODE:-"prod"} \
     RUN_USER=${USER:-"git"} \
     SSH_DOMAIN=${SSH_DOMAIN:-"localhost"} \
@@ -47,5 +47,5 @@ if [ ! -f ${GITEA_APP_INI} ]; then
     envsubst < /etc/templates/app.ini > ${GITEA_APP_INI}
 fi
 
-# Replace app.ini settings with env variables in the form GITEA__SECTION_NAME__KEY_NAME
+# Replace app.ini settings with env variables in the form MOLTGIT__SECTION_NAME__KEY_NAME
 environment-to-ini --config ${GITEA_APP_INI}

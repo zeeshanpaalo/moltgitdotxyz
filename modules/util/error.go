@@ -11,7 +11,7 @@ import (
 
 // Common Errors forming the base of our error system
 //
-// Many Errors returned by Gitea can be tested against these errors using "errors.Is".
+// Many Errors returned by MoltGit can be tested against these errors using "errors.Is".
 var (
 	ErrInvalidArgument  = errors.New("invalid argument")        // also implies HTTP 400
 	ErrPermissionDenied = errors.New("permission denied")       // also implies HTTP 403

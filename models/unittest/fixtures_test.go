@@ -60,7 +60,7 @@ func NewFixturesLoaderVendorGoTestfixtures(e *xorm.Engine, opts unittest.Fixture
 
 func prepareTestFixturesLoaders(t testing.TB) unittest.FixturesOptions {
 	_ = user_model.User{}
-	giteaRoot := setting.SetupGiteaTestEnv()
+	giteaRoot := setting.SetupMoltGitTestEnv()
 	opts := unittest.FixturesOptions{Dir: filepath.Join(giteaRoot, "models", "fixtures"), Files: []string{
 		"user.yml",
 	}}

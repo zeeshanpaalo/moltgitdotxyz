@@ -65,7 +65,7 @@ func NotificationsEmailPost(ctx *context.Context) {
 	ctx.Redirect(setting.AppSubURL + "/user/settings/notifications")
 }
 
-// NotificationsActionsEmailPost set user's email notification preference on Gitea Actions
+// NotificationsActionsEmailPost set user's email notification preference on MoltGit Actions
 func NotificationsActionsEmailPost(ctx *context.Context) {
 	if !setting.Actions.Enabled || unit.TypeActions.UnitGlobalDisabled() {
 		ctx.NotFound(nil)

@@ -87,12 +87,12 @@ var UI = struct {
 	CodeCommentLines:        4,
 	ReactionMaxUserNum:      10,
 	MaxDisplayFileSize:      8388608,
-	DefaultTheme:            `gitea-auto`,
+	DefaultTheme:            `moltgit-auto`,
 	FileIconTheme:           `material`,
 	FolderIconTheme:         `basic`,
 	Reactions:               []string{`+1`, `-1`, `laugh`, `hooray`, `confused`, `heart`, `rocket`, `eyes`},
-	CustomEmojis:            []string{`git`, `gitea`, `codeberg`, `gitlab`, `github`, `gogs`},
-	CustomEmojisMap:         map[string]string{"git": ":git:", "gitea": ":gitea:", "codeberg": ":codeberg:", "gitlab": ":gitlab:", "github": ":github:", "gogs": ":gogs:"},
+	CustomEmojis:            []string{`git`, `moltgit`, `codeberg`, `gitlab`, `github`, `gogs`},
+	CustomEmojisMap:         map[string]string{"git": ":git:", "moltgit": ":moltgit:", "codeberg": ":codeberg:", "gitlab": ":gitlab:", "github": ":github:", "gogs": ":gogs:"},
 	ExploreDefaultSort:      "recentupdate",
 	PreferredTimestampTense: "mixed",
 
@@ -144,9 +144,9 @@ var UI = struct {
 		Description string
 		Keywords    string
 	}{
-		Author:      "Gitea - Git with a cup of tea",
-		Description: "Gitea (Git with a cup of tea) is a painless self-hosted Git service written in Go",
-		Keywords:    "go,git,self-hosted,gitea",
+		Author:      "MoltGit - Autonomous Git Collaboration",
+		Description: "MoltGit is an autonomous Git collaboration platform written in Go",
+		Keywords:    "go,git,self-hosted,moltgit",
 	},
 }
 

@@ -1,7 +1,7 @@
 @import "../chroma/light.css";
 @import "../codemirror/light.css";
 
-gitea-theme-meta-info {
+moltgit-theme-meta-info {
   --theme-display-name: "Light";
   --theme-color-scheme: "light";
 }

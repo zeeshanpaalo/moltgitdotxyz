@@ -4,7 +4,7 @@ FROM docker.io/library/golang:1.26-alpine3.23 AS build-env
 
 ARG GOPROXY=direct
 
-ARG GITEA_VERSION
+ARG MOLTGIT_VERSION
 ARG TAGS="sqlite sqlite_unlock_notify"
 ENV TAGS="bindata timetzdata $TAGS"
 ARG CGO_EXTRA_CFLAGS
@@ -20,7 +20,7 @@ WORKDIR ${GOPATH}/src/code.gitea.io/gitea
 # See the comments in Dockerfile
 COPY --exclude=.git/ . .
 
-# Build gitea, .git mount is required for version data
+# Build MoltGit, .git mount is required for version data
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target="/root/.cache/go-build" \
     --mount=type=cache,target=/root/.local/share/pnpm/store \
@@ -31,9 +31,9 @@ COPY docker/rootless /tmp/local
 
 # Set permissions for builds that made under windows which strips the executable bit from file
 RUN chmod 755 /tmp/local/usr/local/bin/* \
-              /go/src/code.gitea.io/gitea/gitea
+              /go/src/code.gitea.io/gitea/moltgit
 
-FROM docker.io/library/alpine:3.23 AS gitea-rootless
+FROM docker.io/library/alpine:3.23 AS moltgit-rootless
 
 EXPOSE 2222 3000
 
@@ -52,30 +52,30 @@ RUN addgroup \
     git && \
   adduser \
     -S -H -D \
-    -h /var/lib/gitea/git \
+    -h /var/lib/moltgit/git \
     -s /bin/bash \
     -u 1000 \
     -G git \
     git
 
-RUN mkdir -p /var/lib/gitea /etc/gitea
-RUN chown git:git /var/lib/gitea /etc/gitea
+RUN mkdir -p /var/lib/moltgit /etc/moltgit
+RUN chown git:git /var/lib/moltgit /etc/moltgit
 
 COPY --from=build-env /tmp/local /
-COPY --from=build-env --chown=root:root /go/src/code.gitea.io/gitea/gitea /app/gitea/gitea
+COPY --from=build-env --chown=root:root /go/src/code.gitea.io/gitea/moltgit /app/moltgit/moltgit
 
 # git:git
 USER 1000:1000
-ENV GITEA_WORK_DIR=/var/lib/gitea
-ENV GITEA_CUSTOM=/var/lib/gitea/custom
-ENV GITEA_TEMP=/tmp/gitea
-ENV TMPDIR=/tmp/gitea
+ENV GITEA_WORK_DIR=/var/lib/moltgit
+ENV GITEA_CUSTOM=/var/lib/moltgit/custom
+ENV GITEA_TEMP=/tmp/moltgit
+ENV TMPDIR=/tmp/moltgit
 
 # TODO add to docs the ability to define the ini to load (useful to test and revert a config)
-ENV GITEA_APP_INI=/etc/gitea/app.ini
-ENV HOME="/var/lib/gitea/git"
-VOLUME ["/var/lib/gitea", "/etc/gitea"]
-WORKDIR /var/lib/gitea
+ENV GITEA_APP_INI=/etc/moltgit/app.ini
+ENV HOME="/var/lib/moltgit/git"
+VOLUME ["/var/lib/moltgit", "/etc/moltgit"]
+WORKDIR /var/lib/moltgit
 
 # HINT: HEALTH-CHECK-ENDPOINT: don't use HEALTHCHECK, search this hint keyword for more information
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/docker-entrypoint.sh"]

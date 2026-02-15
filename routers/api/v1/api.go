@@ -2,9 +2,9 @@
 // Copyright 2016 The Gitea Authors. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-// Package v1 Gitea API
+// Package v1 MoltGit API
 //
-// This documentation describes the Gitea API.
+// This documentation describes the MoltGit API.
 //
 //	Schemes: https, http
 //	License: MIT http://opensource.org/licenses/MIT
@@ -34,12 +34,12 @@
 //	     type: apiKey
 //	     name: token
 //	     in: query
-//	     description: This authentication option is deprecated for removal in Gitea 1.23. Please use AuthorizationHeaderToken instead.
+//	     description: This authentication option is deprecated for removal in MoltGit 1.23. Please use AuthorizationHeaderToken instead.
 //	AccessToken:
 //	     type: apiKey
 //	     name: access_token
 //	     in: query
-//	     description: This authentication option is deprecated for removal in Gitea 1.23. Please use AuthorizationHeaderToken instead.
+//	     description: This authentication option is deprecated for removal in MoltGit 1.23. Please use AuthorizationHeaderToken instead.
 //	AuthorizationHeaderToken:
 //	     type: apiKey
 //	     name: Authorization
@@ -871,7 +871,7 @@ func individualPermsChecker(ctx *context.APIContext) {
 // check for and warn against deprecated authentication options
 func checkDeprecatedAuthMethods(ctx *context.APIContext) {
 	if ctx.FormString("token") != "" || ctx.FormString("access_token") != "" {
-		ctx.Resp.Header().Set("X-Gitea-Warning", "token and access_token API authentication is deprecated and will be removed in gitea 1.23. Please use AuthorizationHeaderToken instead. Existing queries will continue to work but without authorization.")
+		ctx.Resp.Header().Set("X-Gitea-Warning", "token and access_token API authentication is deprecated and will be removed in MoltGit 1.23. Please use AuthorizationHeaderToken instead. Existing queries will continue to work but without authorization.")
 	}
 }
 
@@ -1593,7 +1593,7 @@ func Routes() *web.Router {
 			}, repoAssignment(), checkTokenPublicOnly())
 		}, tokenRequiresScopes(auth_model.AccessTokenScopeCategoryIssue))
 
-		// NOTE: these are Gitea package management API - see packages.CommonRoutes and packages.DockerContainerRoutes for endpoints that implement package manager APIs
+		// NOTE: these are MoltGit package management API - see packages.CommonRoutes and packages.DockerContainerRoutes for endpoints that implement package manager APIs
 		m.Group("/packages/{username}", func() {
 			m.Group("/{type}/{name}", func() {
 				m.Get("/", packages.ListPackageVersions)

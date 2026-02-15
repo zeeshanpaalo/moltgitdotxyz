@@ -56,7 +56,7 @@ func (i *Indexer) Init(_ context.Context) (bool, error) {
 	}
 
 	if version != 0 {
-		log.Warn("Found older bleve index with version %d, Gitea will remove it and rebuild", version)
+		log.Warn("Found older bleve index with version %d, MoltGit will remove it and rebuild", version)
 	}
 
 	indexMapping, err := i.mappingGetter()

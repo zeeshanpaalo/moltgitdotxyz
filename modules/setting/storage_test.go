@@ -13,28 +13,28 @@ import (
 func Test_getStorageMultipleName(t *testing.T) {
 	iniStr := `
 [lfs]
-MINIO_BUCKET = gitea-lfs
+MINIO_BUCKET = moltgit-lfs
 
 [attachment]
-MINIO_BUCKET = gitea-attachment
+MINIO_BUCKET = moltgit-attachment
 
 [storage]
 STORAGE_TYPE = minio
-MINIO_BUCKET = gitea-storage
+MINIO_BUCKET = moltgit-storage
 `
 	cfg, err := NewConfigProviderFromData(iniStr)
 	assert.NoError(t, err)
 
 	assert.NoError(t, loadAttachmentFrom(cfg))
-	assert.Equal(t, "gitea-attachment", Attachment.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit-attachment", Attachment.Storage.MinioConfig.Bucket)
 	assert.Equal(t, "attachments/", Attachment.Storage.MinioConfig.BasePath)
 
 	assert.NoError(t, loadLFSFrom(cfg))
-	assert.Equal(t, "gitea-lfs", LFS.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit-lfs", LFS.Storage.MinioConfig.Bucket)
 	assert.Equal(t, "lfs/", LFS.Storage.MinioConfig.BasePath)
 
 	assert.NoError(t, loadAvatarsFrom(cfg))
-	assert.Equal(t, "gitea-storage", Avatar.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit-storage", Avatar.Storage.MinioConfig.Bucket)
 	assert.Equal(t, "avatars/", Avatar.Storage.MinioConfig.BasePath)
 }
 
@@ -45,17 +45,17 @@ STORAGE_TYPE = lfs
 
 [storage.lfs]
 STORAGE_TYPE = minio
-MINIO_BUCKET = gitea-storage
+MINIO_BUCKET = moltgit-storage
 `
 	cfg, err := NewConfigProviderFromData(iniStr)
 	assert.NoError(t, err)
 
 	assert.NoError(t, loadAttachmentFrom(cfg))
-	assert.Equal(t, "gitea-storage", Attachment.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit-storage", Attachment.Storage.MinioConfig.Bucket)
 	assert.Equal(t, "attachments/", Attachment.Storage.MinioConfig.BasePath)
 
 	assert.NoError(t, loadLFSFrom(cfg))
-	assert.Equal(t, "gitea-storage", LFS.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit-storage", LFS.Storage.MinioConfig.Bucket)
 	assert.Equal(t, "lfs/", LFS.Storage.MinioConfig.BasePath)
 }
 
@@ -69,31 +69,31 @@ STORAGE_TYPE = minio
 
 	assert.NoError(t, loadPackagesFrom(cfg))
 	assert.EqualValues(t, "minio", Packages.Storage.Type)
-	assert.Equal(t, "gitea", Packages.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit", Packages.Storage.MinioConfig.Bucket)
 	assert.Equal(t, "packages/", Packages.Storage.MinioConfig.BasePath)
 
 	assert.NoError(t, loadRepoArchiveFrom(cfg))
 	assert.EqualValues(t, "minio", RepoArchive.Storage.Type)
-	assert.Equal(t, "gitea", RepoArchive.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit", RepoArchive.Storage.MinioConfig.Bucket)
 	assert.Equal(t, "repo-archive/", RepoArchive.Storage.MinioConfig.BasePath)
 
 	assert.NoError(t, loadActionsFrom(cfg))
 	assert.EqualValues(t, "minio", Actions.LogStorage.Type)
-	assert.Equal(t, "gitea", Actions.LogStorage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit", Actions.LogStorage.MinioConfig.Bucket)
 	assert.Equal(t, "actions_log/", Actions.LogStorage.MinioConfig.BasePath)
 
 	assert.EqualValues(t, "minio", Actions.ArtifactStorage.Type)
-	assert.Equal(t, "gitea", Actions.ArtifactStorage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit", Actions.ArtifactStorage.MinioConfig.Bucket)
 	assert.Equal(t, "actions_artifacts/", Actions.ArtifactStorage.MinioConfig.BasePath)
 
 	assert.NoError(t, loadAvatarsFrom(cfg))
 	assert.EqualValues(t, "minio", Avatar.Storage.Type)
-	assert.Equal(t, "gitea", Avatar.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit", Avatar.Storage.MinioConfig.Bucket)
 	assert.Equal(t, "avatars/", Avatar.Storage.MinioConfig.BasePath)
 
 	assert.NoError(t, loadRepoAvatarFrom(cfg))
 	assert.EqualValues(t, "minio", RepoAvatar.Storage.Type)
-	assert.Equal(t, "gitea", RepoAvatar.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "moltgit", RepoAvatar.Storage.MinioConfig.Bucket)
 	assert.Equal(t, "repo-avatars/", RepoAvatar.Storage.MinioConfig.BasePath)
 }
 
@@ -107,31 +107,31 @@ STORAGE_TYPE = azureblob
 
 	assert.NoError(t, loadPackagesFrom(cfg))
 	assert.EqualValues(t, "azureblob", Packages.Storage.Type)
-	assert.Equal(t, "gitea", Packages.Storage.AzureBlobConfig.Container)
+	assert.Equal(t, "moltgit", Packages.Storage.AzureBlobConfig.Container)
 	assert.Equal(t, "packages/", Packages.Storage.AzureBlobConfig.BasePath)
 
 	assert.NoError(t, loadRepoArchiveFrom(cfg))
 	assert.EqualValues(t, "azureblob", RepoArchive.Storage.Type)
-	assert.Equal(t, "gitea", RepoArchive.Storage.AzureBlobConfig.Container)
+	assert.Equal(t, "moltgit", RepoArchive.Storage.AzureBlobConfig.Container)
 	assert.Equal(t, "repo-archive/", RepoArchive.Storage.AzureBlobConfig.BasePath)
 
 	assert.NoError(t, loadActionsFrom(cfg))
 	assert.EqualValues(t, "azureblob", Actions.LogStorage.Type)
-	assert.Equal(t, "gitea", Actions.LogStorage.AzureBlobConfig.Container)
+	assert.Equal(t, "moltgit", Actions.LogStorage.AzureBlobConfig.Container)
 	assert.Equal(t, "actions_log/", Actions.LogStorage.AzureBlobConfig.BasePath)
 
 	assert.EqualValues(t, "azureblob", Actions.ArtifactStorage.Type)
-	assert.Equal(t, "gitea", Actions.ArtifactStorage.AzureBlobConfig.Container)
+	assert.Equal(t, "moltgit", Actions.ArtifactStorage.AzureBlobConfig.Container)
 	assert.Equal(t, "actions_artifacts/", Actions.ArtifactStorage.AzureBlobConfig.BasePath)
 
 	assert.NoError(t, loadAvatarsFrom(cfg))
 	assert.EqualValues(t, "azureblob", Avatar.Storage.Type)
-	assert.Equal(t, "gitea", Avatar.Storage.AzureBlobConfig.Container)
+	assert.Equal(t, "moltgit", Avatar.Storage.AzureBlobConfig.Container)
 	assert.Equal(t, "avatars/", Avatar.Storage.AzureBlobConfig.BasePath)
 
 	assert.NoError(t, loadRepoAvatarFrom(cfg))
 	assert.EqualValues(t, "azureblob", RepoAvatar.Storage.Type)
-	assert.Equal(t, "gitea", RepoAvatar.Storage.AzureBlobConfig.Container)
+	assert.Equal(t, "moltgit", RepoAvatar.Storage.AzureBlobConfig.Container)
 	assert.Equal(t, "repo-avatars/", RepoAvatar.Storage.AzureBlobConfig.BasePath)
 }
 

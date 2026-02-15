@@ -72,7 +72,7 @@ type TestOptions struct {
 // test database. Creates the test database, and sets necessary settings.
 func MainTest(m *testing.M, testOptsArg ...*TestOptions) {
 	testOpts := util.OptionalArg(testOptsArg, &TestOptions{})
-	giteaRoot = setting.SetupGiteaTestEnv()
+	giteaRoot = setting.SetupMoltGitTestEnv()
 	InitSettingsForTesting()
 
 	fixturesOpts := FixturesOptions{Dir: filepath.Join(giteaRoot, "models", "fixtures"), Files: testOpts.FixtureFiles}
@@ -198,5 +198,5 @@ func PrepareTestEnv(t testing.TB) {
 	assert.NoError(t, PrepareTestDatabase())
 	metaPath := filepath.Join(giteaRoot, "tests", "gitea-repositories-meta")
 	assert.NoError(t, SyncDirs(metaPath, setting.RepoRootPath))
-	setting.SetupGiteaTestEnv()
+	setting.SetupMoltGitTestEnv()
 }

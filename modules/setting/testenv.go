@@ -13,27 +13,27 @@ import (
 	"code.gitea.io/gitea/modules/util"
 )
 
-func SetupGiteaTestEnv() string {
+func SetupMoltGitTestEnv() string {
 	giteaRoot := os.Getenv("GITEA_TEST_ROOT")
 	if giteaRoot == "" {
 		_, filename, _, _ := runtime.Caller(0)
 		giteaRoot = filepath.Dir(filepath.Dir(filepath.Dir(filename)))
 		fixturesDir := filepath.Join(giteaRoot, "models", "fixtures")
 		if _, err := os.Stat(fixturesDir); err != nil {
-			panic("in gitea source code directory, fixtures directory not found: " + fixturesDir)
+			panic("in moltgit source code directory, fixtures directory not found: " + fixturesDir)
 		}
 	}
 
 	appWorkPathBuiltin = giteaRoot
 	AppWorkPath = giteaRoot
-	AppPath = filepath.Join(giteaRoot, "gitea") + util.Iif(IsWindows, ".exe", "")
+	AppPath = filepath.Join(giteaRoot, "moltgit") + util.Iif(IsWindows, ".exe", "")
 
 	// giteaConf (GITEA_CONF) must be relative because it is used in the git hooks as "$GITEA_ROOT/$GITEA_CONF"
 	giteaConf := os.Getenv("GITEA_TEST_CONF")
 	if giteaConf == "" {
 		// By default, use sqlite.ini for testing, then IDE like GoLand can start the test process with debugger.
 		// It's easier for developers to debug bugs step by step with a debugger.
-		// Notice: when doing "ssh push", Gitea executes sub processes, debugger won't work for the sub processes.
+		// Notice: when doing "ssh push", MoltGit executes sub processes, debugger won't work for the sub processes.
 		giteaConf = "tests/sqlite.ini"
 		_, _ = fmt.Fprintf(os.Stderr, "Environment variable GITEA_TEST_CONF not set - defaulting to %s\n", giteaConf)
 		if !EnableSQLite3 {

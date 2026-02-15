@@ -9,7 +9,7 @@
     - [Types of issues](#types-of-issues)
     - [Discuss your design before the implementation](#discuss-your-design-before-the-implementation)
     - [Issue locking](#issue-locking)
-  - [Building Gitea](#building-gitea)
+  - [Building MoltGit](#building-moltgit)
   - [Dependencies](#dependencies)
     - [Backend](#backend)
     - [Frontend](#frontend)
@@ -55,17 +55,17 @@
   - [TOC \& Working groups](#toc--working-groups)
   - [Roadmap](#roadmap)
   - [Versions](#versions)
-  - [Releasing Gitea](#releasing-gitea)
+  - [Releasing MoltGit](#releasing-moltgit)
 
 </details>
 
 ## Introduction
 
-This document explains how to contribute changes to the Gitea project. \
+This document explains how to contribute changes to the MoltGit project. \
 It assumes you have followed the [installation instructions](https://docs.gitea.com/category/installation). \
 Sensitive security-related issues should be reported to [security@gitea.io](mailto:security@gitea.io).
 
-For configuring IDEs for Gitea development, see the [contributed IDE configurations](contrib/ide/).
+For configuring IDEs for MoltGit development, see the [contributed IDE configurations](contrib/ide/).
 
 ## Issues
 
@@ -77,10 +77,10 @@ If your issue has not been reported yet, [open an issue](https://github.com/go-g
 and answer the questions so we can understand and reproduce the problematic behavior. \
 Please write clear and concise instructions so that we can reproduce the behavior — even if it seems obvious. \
 The more detailed and specific you are, the faster we can fix the issue. \
-It is really helpful if you can reproduce your problem on a site running on the latest commits, i.e. <https://demo.gitea.com>, as perhaps your problem has already been fixed on a current version. \
+It is really helpful if you can reproduce your problem on a site running on the latest commits, as perhaps your problem has already been fixed on a current version. \
 Please follow the guidelines described in [How to Report Bugs Effectively](http://www.chiark.greenend.org.uk/~sgtatham/bugs.html) for your report.
 
-Please be kind—remember that Gitea comes at no cost to you, and you're getting free help.
+Please be kind—remember that MoltGit comes at no cost to you, and you're getting free help.
 
 ### Types of issues
 
@@ -90,7 +90,7 @@ Typically, issues fall in one of the following categories:
 - `security issue`: bug that has serious implications such as leaking another users data. Please do not file such issues on the public tracker and send a mail to security@gitea.io instead
 - `feature`: Completely new functionality. You should describe this feature in enough detail that anyone who reads the issue can understand how it is supposed to be implemented
 - `enhancement`: An existing feature should get an upgrade
-- `refactoring`: Parts of the code base don't conform with other parts and should be changed to improve Gitea's maintainability
+- `refactoring`: Parts of the code base don't conform with other parts and should be changed to improve MoltGit's maintainability
 
 ### Discuss your design before the implementation
 
@@ -111,7 +111,7 @@ Such comments will likely be overlooked as some maintainers may not view notific
 As such, commenting on closed/merged issues/PRs may be disabled prior to the scheduled auto-locking if a discussion starts or if unrelated comments are posted.
 If further discussion is needed, we encourage you to open a new issue instead and we recommend linking to the issue/PR in question for context.
 
-## Building Gitea
+## Building MoltGit
 
 See the [development setup instructions](https://docs.gitea.com/development/hacking-on-gitea).
 
@@ -145,14 +145,14 @@ Depending on your change, please read the
 
 ## Styleguide
 
-You should always run `make fmt` before committing to conform to Gitea's styleguide.
+You should always run `make fmt` before committing to conform to MoltGit's styleguide.
 
 ## Copyright
 
 New code files that you contribute should use the standard copyright header:
 
 ```
-// Copyright <current year> The Gitea Authors. All rights reserved.
+// Copyright <current year> The MoltGit Authors. All rights reserved.
 // SPDX-License-Identifier: MIT
 ```
 
@@ -183,7 +183,7 @@ Here's how to run the test suite:
 ## Translation
 
 All translation work happens on [Crowdin](https://translate.gitea.com).
-The only translation that is maintained in this repository is [the English translation](https://github.com/go-gitea/gitea/blob/main/options/locale/locale_en-US.ini).
+The only translation that is maintained in this repository is the English translation (`options/locale/locale_en-US.json`).
 It is synced regularly with Crowdin. \
 Other locales on main branch **should not** be updated manually as they will be overwritten with each sync. \
 Once a language has reached a **satisfactory percentage** of translated keys (~25%), it will be synced back into this repo and included in the next released version.
@@ -226,7 +226,7 @@ Another requirement for merging PRs is that the PR is labeled correctly.\
 However, this is not your job as a contributor, but the job of the person merging your PR.\
 If you think that your PR was labeled incorrectly, or notice that it was merged without labels, please let us know.
 
-If your PR closes some issues, you must note that in a way that both GitHub and Gitea understand, i.e. by appending a paragraph like
+If your PR closes some issues, you must note that in a way that both GitHub and MoltGit understand, i.e. by appending a paragraph like
 
 ```text
 Fixes/Closes/Resolves #<ISSUE_NR_X>.
@@ -244,10 +244,10 @@ PRs without a milestone may not be merged.
 
 ### Labels
 
-Almost all labels used inside Gitea can be classified as one of the following:
+Almost all labels used inside MoltGit can be classified as one of the following:
 
 - `modifies/…`: Determines which parts of the codebase are affected. These labels will be set through the CI.
-- `topic/…`:  Determines the conceptual component of Gitea that is affected, i.e. issues, projects, or authentication. At best, PRs should only target one component but there might be overlap. Must be set manually.
+- `topic/…`:  Determines the conceptual component of MoltGit that is affected, i.e. issues, projects, or authentication. At best, PRs should only target one component but there might be overlap. Must be set manually.
 - `type/…`: Determines the type of an issue or PR (feature, refactoring, docs, bug, …). If GitHub supported scoped labels, these labels would be exclusive, so you should set **exactly** one, not more or less (every PR should fall into one of the provided categories, and only one).
 - `issue/…` / `pr/…`: Labels that are specific to issues or PRs respectively and that are only necessary in a given context, i.e. `issue/not-a-bug` or `pr/need-2-approvals`
 
@@ -296,9 +296,9 @@ This means that all changes are joined into a single new commit whose message is
 
 ### Getting PRs merged
 
-Changes to Gitea must be reviewed before they are accepted — no matter who
+Changes to MoltGit must be reviewed before they are accepted — no matter who
 makes the change, even if they are an owner or a maintainer. \
-The only exception are critical bugs that prevent Gitea from being compiled or started. \
+The only exception are critical bugs that prevent MoltGit from being compiled or started. \
 Specifically, we require two approvals from maintainers for every PR. \
 Once this criteria has been met, your PR receives the `lgtm/done` label. \
 From this point on, your only responsibility is to fix merge conflicts or respond to/implement requests by maintainers. \
@@ -310,7 +310,7 @@ The merge queue will be cleared in the order of the list below:
 
 <https://github.com/go-gitea/gitea/pulls?q=is%3Apr+label%3Areviewed%2Fwait-merge+sort%3Acreated-asc+is%3Aopen>
 
-Gitea uses it's own tool, the <https://github.com/GiteaBot/gitea-backporter> to automate parts of the review process. \
+MoltGit uses its own tool to automate parts of the review process. \
 This tool does the things listed below automatically:
 
 - create a backport PR if needed once the initial PR was merged
@@ -358,7 +358,7 @@ $REWRITTEN_PR_SUMMARY
 
 ## Documentation
 
-If you add a new feature or change an existing aspect of Gitea, the documentation for that feature must be created or updated in another PR at [https://gitea.com/gitea/docs](https://gitea.com/gitea/docs).
+If you add a new feature or change an existing aspect of MoltGit, the documentation for that feature must be created or updated accordingly.
 **The docs directory on main repository will be removed at some time. We will have a yaml file to store configuration file's meta data. After that completed, configuration documentation should be in the main repository.**
 
 ## API v1
@@ -367,9 +367,9 @@ The API is documented by [swagger](https://gitea.com/api/swagger) and is based o
 
 ### GitHub API compatibility
 
-Gitea's API should use the same endpoints and fields as the GitHub API as far as possible, unless there are good reasons to deviate. \
-If Gitea provides functionality that GitHub does not, a new endpoint can be created. \
-If information is provided by Gitea that is not provided by the GitHub API, a new field can be used that doesn't collide with any GitHub fields. \
+MoltGit's API should use the same endpoints and fields as the GitHub API as far as possible, unless there are good reasons to deviate. \
+If MoltGit provides functionality that GitHub does not, a new endpoint can be created. \
+If information is provided by MoltGit that is not provided by the GitHub API, a new field can be used that doesn't collide with any GitHub fields. \
 Updating an existing API should not remove existing fields unless there is a really good reason to do so. \
 The same applies to status responses. If you notice a problem, feel free to leave a comment in the code for future refactoring to API v2 (which is currently not planned).
 
@@ -480,7 +480,7 @@ still possible.
 To make sure every PR is checked, we have [maintainers](MAINTAINERS). \
 Every PR **must** be reviewed by at least two maintainers (or owners) before it can get merged. \
 For refactoring PRs after a week and documentation only PRs, the approval of only one maintainer is enough. \
-A maintainer should be a contributor of Gitea and contributed at least
+A maintainer should be a contributor of MoltGit and contributed at least
 4 accepted PRs. A contributor should apply as a maintainer in the
 [Discord](https://discord.gg/Gitea) `#develop` channel. The team maintainers may invite the contributor. A maintainer
 should spend some time on code reviews. If a maintainer has no
@@ -556,19 +556,19 @@ Gitea Ltd employees are not eligible to receive any funds from the OpenCollectiv
 
 ## TOC & Working groups
 
-With Gitea covering many projects outside of the main repository, several groups will be created to help focus on specific areas instead of requiring maintainers to be a jack-of-all-trades. Maintainers are of course more than welcome to be part of multiple groups should they wish to contribute in multiple places.
+With MoltGit covering many projects outside of the main repository, several groups will be created to help focus on specific areas instead of requiring maintainers to be a jack-of-all-trades. Maintainers are of course more than welcome to be part of multiple groups should they wish to contribute in multiple places.
 
 The currently proposed groups are:
 
-- **Core Group**: maintain the primary Gitea repository
-- **Integration Group**: maintain the Gitea ecosystem's related tools, including go-sdk/tea/changelog/bots etc.
+- **Core Group**: maintain the primary MoltGit repository
+- **Integration Group**: maintain the MoltGit ecosystem's related tools, including go-sdk/tea/changelog/bots etc.
 - **Documentation Group**: maintain related documents and repositories
 - **Translation Group**: coordinate with translators and maintain translations
 - **Security Group**: managed by TOC directly, members are decided by TOC, maintains security patches/responsible for security items
 
 ## Roadmap
 
-Each year a roadmap will be discussed with the entire Gitea maintainers team, and feedback will be solicited from various stakeholders.
+Each year a roadmap will be discussed with the entire MoltGit maintainers team, and feedback will be solicited from various stakeholders.
 TOC members need to review the roadmap every year and work together on the direction of the project.
 
 When a vote is required for a proposal or other change, the vote of community elected TOC members count slightly more than the vote of company elected TOC members. With this approach, we both avoid ties and ensure that changes align with the mission statement and community opinion.
@@ -577,18 +577,18 @@ You can visit our roadmap on the wiki.
 
 ## Versions
 
-Gitea has the `main` branch as a tip branch and has version branches
+MoltGit has the `main` branch as a tip branch and has version branches
 such as `release/v1.19`. `release/v1.19` is a release branch and we will
 tag `v1.19.0` for binary download. If `v1.19.0` has bugs, we will accept
 pull requests on the `release/v1.19` branch and publish a `v1.19.1` tag,
 after bringing the bug fix also to the main branch.
 
-Since the `main` branch is a tip version, if you wish to use Gitea
+Since the `main` branch is a tip version, if you wish to use MoltGit
 in production, please download the latest release tag version. All the
 branches will be protected via GitHub, all the PRs to every branch must
 be reviewed by two maintainers and must pass the automatic tests.
 
-## Releasing Gitea
+## Releasing MoltGit
 
 - Let $vmaj, $vmin and $vpat be Major, Minor and Patch version numbers, $vpat should be rc1, rc2, 0, 1, ...... $vmaj.$vmin will be kept the same as milestones on github or gitea in future.
 - Before releasing, confirm all the version's milestone issues or PRs has been resolved. Then discuss the release on Discord channel #maintainers and get agreed with almost all the owners and mergers. Or you can declare the version and if nobody is against it in about several hours.

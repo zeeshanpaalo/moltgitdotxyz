@@ -41,7 +41,7 @@ GO_LICENSES_PACKAGE ?= github.com/google/go-licenses@v1
 GOVULNCHECK_PACKAGE ?= golang.org/x/vuln/cmd/govulncheck@v1
 ACTIONLINT_PACKAGE ?= github.com/rhysd/actionlint/cmd/actionlint@v1.7.10
 
-DOCKER_IMAGE ?= gitea/gitea
+DOCKER_IMAGE ?= moltgit/moltgit
 DOCKER_TAG ?= latest
 DOCKER_REF := $(DOCKER_IMAGE):$(DOCKER_TAG)
 
@@ -70,10 +70,10 @@ else ifeq ($(patsubst Windows%,Windows,$(OS)),Windows)
 endif
 ifeq ($(IS_WINDOWS),yes)
 	GOFLAGS := -v -buildmode=exe
-	EXECUTABLE ?= gitea.exe
+	EXECUTABLE ?= moltgit.exe
 else
 	GOFLAGS := -v
-	EXECUTABLE ?= gitea
+	EXECUTABLE ?= moltgit
 endif
 
 ifeq ($(shell sed --version 2>/dev/null | grep -q GNU && echo gnu),gnu)
@@ -109,7 +109,7 @@ endif
 
 ifneq ($(GITHUB_REF_TYPE),branch)
 	VERSION ?= $(subst v,,$(GITHUB_REF_NAME))
-	GITEA_VERSION ?= $(VERSION)
+	MOLTGIT_VERSION ?= $(VERSION)
 else
 	ifneq ($(GITHUB_REF_NAME),)
 		VERSION ?= $(subst release/v,,$(GITHUB_REF_NAME))-nightly
@@ -119,9 +119,9 @@ else
 
 	STORED_VERSION=$(shell cat $(STORED_VERSION_FILE) 2>/dev/null)
 	ifneq ($(STORED_VERSION),)
-		GITEA_VERSION ?= $(STORED_VERSION)
+		MOLTGIT_VERSION ?= $(STORED_VERSION)
 	else
-		GITEA_VERSION ?= $(shell git describe --tags --always | sed 's/-/+/' | sed 's/^v//')
+		MOLTGIT_VERSION ?= $(shell git describe --tags --always | sed 's/-/+/' | sed 's/^v//')
 	endif
 endif
 
@@ -130,7 +130,7 @@ ifeq ($(VERSION),main)
 	VERSION := main-nightly
 endif
 
-LDFLAGS := $(LDFLAGS) -X "main.MakeVersion=$(MAKE_VERSION)" -X "main.Version=$(GITEA_VERSION)" -X "main.Tags=$(TAGS)"
+LDFLAGS := $(LDFLAGS) -X "main.MakeVersion=$(MAKE_VERSION)" -X "main.Version=$(MOLTGIT_VERSION)" -X "main.Tags=$(TAGS)"
 
 LINUX_ARCHS ?= linux/amd64,linux/386,linux/arm-5,linux/arm-6,linux/arm64,linux/riscv64
 
@@ -183,17 +183,17 @@ SWAGGER_SPEC_INPUT := templates/swagger/v1_input.json
 SWAGGER_EXCLUDE := code.gitea.io/sdk
 
 TEST_MYSQL_HOST ?= mysql:3306
-TEST_MYSQL_DBNAME ?= testgitea
+TEST_MYSQL_DBNAME ?= testmoltgit
 TEST_MYSQL_USERNAME ?= root
 TEST_MYSQL_PASSWORD ?=
 TEST_PGSQL_HOST ?= pgsql:5432
-TEST_PGSQL_DBNAME ?= testgitea
+TEST_PGSQL_DBNAME ?= testmoltgit
 TEST_PGSQL_USERNAME ?= postgres
 TEST_PGSQL_PASSWORD ?= postgres
 TEST_PGSQL_SCHEMA ?= gtestschema
 TEST_MINIO_ENDPOINT ?= minio:9000
 TEST_MSSQL_HOST ?= mssql:1433
-TEST_MSSQL_DBNAME ?= gitea
+TEST_MSSQL_DBNAME ?= moltgit
 TEST_MSSQL_USERNAME ?= sa
 TEST_MSSQL_PASSWORD ?= MwantsaSecurePassword1
 
@@ -214,7 +214,7 @@ help: Makefile ## print Makefile help information.
 .PHONY: git-check
 git-check:
 	@if git lfs >/dev/null 2>&1 ; then : ; else \
-		echo "Gitea requires git with lfs support to run tests." ; \
+		echo "MoltGit requires git with lfs support to run tests." ; \
 		exit 1; \
 	fi
 
@@ -227,16 +227,16 @@ clean: ## delete backend and integration files
 	rm -rf $(EXECUTABLE) $(DIST) $(BINDATA_DEST_WILDCARD) \
 		integrations*.test \
 		e2e*.test \
-		tests/integration/gitea-integration-* \
+		tests/integration/moltgit-integration-* \
 		tests/integration/indexers-* \
 		tests/mysql.ini tests/pgsql.ini tests/mssql.ini man/ \
-		tests/e2e/gitea-e2e-*/ \
+		tests/e2e/moltgit-e2e-*/ \
 		tests/e2e/indexers-*/ \
 		tests/e2e/reports/ tests/e2e/test-artifacts/ tests/e2e/test-snapshots/
 
 .PHONY: fmt
 fmt: ## format the Go and template code
-	@GOFUMPT_PACKAGE=$(GOFUMPT_PACKAGE) $(GO) run tools/code-batch-process.go gitea-fmt -w '{file-list}'
+	@GOFUMPT_PACKAGE=$(GOFUMPT_PACKAGE) $(GO) run tools/code-batch-process.go moltgit-fmt -w '{file-list}'
 	$(eval TEMPLATES := $(shell find templates -type f -name '*.tmpl'))
 	@# strip whitespace after '{{' or '(' and before '}}' or ')' unless there is only
 	@# whitespace before it
@@ -398,7 +398,7 @@ lint-json-fix: node_modules ## lint and fix json files
 	$(NODE_VARS) pnpm exec eslint -c eslint.json.config.ts --color --max-warnings=0 --fix
 
 .PHONY: stop
-stop: ## stop Gitea and release port 3000
+stop: ## stop MoltGit and release port 3000
 	@pid=$$(lsof -ti :3000 2>/dev/null); \
 	if [ -n "$$pid" ]; then kill $$pid 2>/dev/null && echo "Stopped process $$pid on port 3000"; else echo "Nothing listening on port 3000"; fi
 
@@ -413,7 +413,7 @@ watch-frontend: node_modules ## watch frontend files and continuously rebuild
 
 .PHONY: watch-backend
 watch-backend: ## watch backend files and continuously rebuild
-	GITEA_RUN_MODE=dev $(GO) run $(AIR_PACKAGE) -c .air.toml
+	MOLTGIT_RUN_MODE=dev $(GO) run $(AIR_PACKAGE) -c .air.toml
 
 .PHONY: test
 test: test-frontend test-backend ## test everything
@@ -492,11 +492,11 @@ generate-ini-sqlite:
 
 .PHONY: test-sqlite
 test-sqlite: integrations.sqlite.test generate-ini-sqlite
-	GITEA_TEST_CONF=tests/sqlite.ini ./integrations.sqlite.test
+	MOLTGIT_TEST_CONF=tests/sqlite.ini ./integrations.sqlite.test
 
 .PHONY: test-sqlite\#%
 test-sqlite\#%: integrations.sqlite.test generate-ini-sqlite
-	GITEA_TEST_CONF=tests/sqlite.ini ./integrations.sqlite.test -test.run $(subst .,/,$*)
+	MOLTGIT_TEST_CONF=tests/sqlite.ini ./integrations.sqlite.test -test.run $(subst .,/,$*)
 
 .PHONY: test-sqlite-migration
 test-sqlite-migration:  migrations.sqlite.test migrations.individual.sqlite.test
@@ -513,11 +513,11 @@ generate-ini-mysql:
 
 .PHONY: test-mysql
 test-mysql: integrations.mysql.test generate-ini-mysql
-	GITEA_TEST_CONF=tests/mysql.ini ./integrations.mysql.test
+	MOLTGIT_TEST_CONF=tests/mysql.ini ./integrations.mysql.test
 
 .PHONY: test-mysql\#%
 test-mysql\#%: integrations.mysql.test generate-ini-mysql
-	GITEA_TEST_CONF=tests/mysql.ini ./integrations.mysql.test -test.run $(subst .,/,$*)
+	MOLTGIT_TEST_CONF=tests/mysql.ini ./integrations.mysql.test -test.run $(subst .,/,$*)
 
 .PHONY: test-mysql-migration
 test-mysql-migration: migrations.mysql.test migrations.individual.mysql.test
@@ -536,11 +536,11 @@ generate-ini-pgsql:
 
 .PHONY: test-pgsql
 test-pgsql: integrations.pgsql.test generate-ini-pgsql
-	GITEA_TEST_CONF=tests/pgsql.ini ./integrations.pgsql.test
+	MOLTGIT_TEST_CONF=tests/pgsql.ini ./integrations.pgsql.test
 
 .PHONY: test-pgsql\#%
 test-pgsql\#%: integrations.pgsql.test generate-ini-pgsql
-	GITEA_TEST_CONF=tests/pgsql.ini ./integrations.pgsql.test -test.run $(subst .,/,$*)
+	MOLTGIT_TEST_CONF=tests/pgsql.ini ./integrations.pgsql.test -test.run $(subst .,/,$*)
 
 .PHONY: test-pgsql-migration
 test-pgsql-migration: migrations.pgsql.test migrations.individual.pgsql.test
@@ -557,11 +557,11 @@ generate-ini-mssql:
 
 .PHONY: test-mssql
 test-mssql: integrations.mssql.test generate-ini-mssql
-	GITEA_TEST_CONF=tests/mssql.ini ./integrations.mssql.test
+	MOLTGIT_TEST_CONF=tests/mssql.ini ./integrations.mssql.test
 
 .PHONY: test-mssql\#%
 test-mssql\#%: integrations.mssql.test generate-ini-mssql
-	GITEA_TEST_CONF=tests/mssql.ini ./integrations.mssql.test -test.run $(subst .,/,$*)
+	MOLTGIT_TEST_CONF=tests/mssql.ini ./integrations.mssql.test -test.run $(subst .,/,$*)
 
 .PHONY: test-mssql-migration
 test-mssql-migration: migrations.mssql.test migrations.individual.mssql.test
@@ -580,59 +580,59 @@ test-e2e: test-e2e-sqlite
 
 .PHONY: test-e2e-sqlite
 test-e2e-sqlite: playwright e2e.sqlite.test generate-ini-sqlite
-	GITEA_TEST_CONF=tests/sqlite.ini ./e2e.sqlite.test
+	MOLTGIT_TEST_CONF=tests/sqlite.ini ./e2e.sqlite.test
 
 .PHONY: test-e2e-sqlite\#%
 test-e2e-sqlite\#%: playwright e2e.sqlite.test generate-ini-sqlite
-	GITEA_TEST_CONF=tests/sqlite.ini ./e2e.sqlite.test -test.run TestE2e/$*
+	MOLTGIT_TEST_CONF=tests/sqlite.ini ./e2e.sqlite.test -test.run TestE2e/$*
 
 .PHONY: test-e2e-mysql
 test-e2e-mysql: playwright e2e.mysql.test generate-ini-mysql
-	GITEA_TEST_CONF=tests/mysql.ini ./e2e.mysql.test
+	MOLTGIT_TEST_CONF=tests/mysql.ini ./e2e.mysql.test
 
 .PHONY: test-e2e-mysql\#%
 test-e2e-mysql\#%: playwright e2e.mysql.test generate-ini-mysql
-	GITEA_TEST_CONF=tests/mysql.ini ./e2e.mysql.test -test.run TestE2e/$*
+	MOLTGIT_TEST_CONF=tests/mysql.ini ./e2e.mysql.test -test.run TestE2e/$*
 
 .PHONY: test-e2e-pgsql
 test-e2e-pgsql: playwright e2e.pgsql.test generate-ini-pgsql
-	GITEA_TEST_CONF=tests/pgsql.ini ./e2e.pgsql.test
+	MOLTGIT_TEST_CONF=tests/pgsql.ini ./e2e.pgsql.test
 
 .PHONY: test-e2e-pgsql\#%
 test-e2e-pgsql\#%: playwright e2e.pgsql.test generate-ini-pgsql
-	GITEA_TEST_CONF=tests/pgsql.ini ./e2e.pgsql.test -test.run TestE2e/$*
+	MOLTGIT_TEST_CONF=tests/pgsql.ini ./e2e.pgsql.test -test.run TestE2e/$*
 
 .PHONY: test-e2e-mssql
 test-e2e-mssql: playwright e2e.mssql.test generate-ini-mssql
-	GITEA_TEST_CONF=tests/mssql.ini ./e2e.mssql.test
+	MOLTGIT_TEST_CONF=tests/mssql.ini ./e2e.mssql.test
 
 .PHONY: test-e2e-mssql\#%
 test-e2e-mssql\#%: playwright e2e.mssql.test generate-ini-mssql
-	GITEA_TEST_CONF=tests/mssql.ini ./e2e.mssql.test -test.run TestE2e/$*
+	MOLTGIT_TEST_CONF=tests/mssql.ini ./e2e.mssql.test -test.run TestE2e/$*
 
 .PHONY: bench-sqlite
 bench-sqlite: integrations.sqlite.test generate-ini-sqlite
-	GITEA_TEST_CONF=tests/sqlite.ini ./integrations.sqlite.test -test.cpuprofile=cpu.out -test.run DontRunTests -test.bench .
+	MOLTGIT_TEST_CONF=tests/sqlite.ini ./integrations.sqlite.test -test.cpuprofile=cpu.out -test.run DontRunTests -test.bench .
 
 .PHONY: bench-mysql
 bench-mysql: integrations.mysql.test generate-ini-mysql
-	GITEA_TEST_CONF=tests/mysql.ini ./integrations.mysql.test -test.cpuprofile=cpu.out -test.run DontRunTests -test.bench .
+	MOLTGIT_TEST_CONF=tests/mysql.ini ./integrations.mysql.test -test.cpuprofile=cpu.out -test.run DontRunTests -test.bench .
 
 .PHONY: bench-mssql
 bench-mssql: integrations.mssql.test generate-ini-mssql
-	GITEA_TEST_CONF=tests/mssql.ini ./integrations.mssql.test -test.cpuprofile=cpu.out -test.run DontRunTests -test.bench .
+	MOLTGIT_TEST_CONF=tests/mssql.ini ./integrations.mssql.test -test.cpuprofile=cpu.out -test.run DontRunTests -test.bench .
 
 .PHONY: bench-pgsql
 bench-pgsql: integrations.pgsql.test generate-ini-pgsql
-	GITEA_TEST_CONF=tests/pgsql.ini ./integrations.pgsql.test -test.cpuprofile=cpu.out -test.run DontRunTests -test.bench .
+	MOLTGIT_TEST_CONF=tests/pgsql.ini ./integrations.pgsql.test -test.cpuprofile=cpu.out -test.run DontRunTests -test.bench .
 
 .PHONY: integration-test-coverage
 integration-test-coverage: integrations.cover.test generate-ini-mysql
-	GITEA_TEST_CONF=tests/mysql.ini ./integrations.cover.test -test.coverprofile=integration.coverage.out
+	MOLTGIT_TEST_CONF=tests/mysql.ini ./integrations.cover.test -test.coverprofile=integration.coverage.out
 
 .PHONY: integration-test-coverage-sqlite
 integration-test-coverage-sqlite: integrations.cover.sqlite.test generate-ini-sqlite
-	GITEA_TEST_CONF=tests/sqlite.ini ./integrations.cover.sqlite.test -test.coverprofile=integration.coverage.out
+	MOLTGIT_TEST_CONF=tests/sqlite.ini ./integrations.cover.sqlite.test -test.coverprofile=integration.coverage.out
 
 integrations.mysql.test: git-check $(GO_SOURCES)
 	$(GO) test $(GOTESTFLAGS) -c code.gitea.io/gitea/tests/integration -o integrations.mysql.test
@@ -655,54 +655,54 @@ integrations.cover.sqlite.test: git-check $(GO_SOURCES)
 .PHONY: migrations.mysql.test
 migrations.mysql.test: $(GO_SOURCES) generate-ini-mysql
 	$(GO) test $(GOTESTFLAGS) -c code.gitea.io/gitea/tests/integration/migration-test -o migrations.mysql.test
-	GITEA_TEST_CONF=tests/mysql.ini ./migrations.mysql.test
+	MOLTGIT_TEST_CONF=tests/mysql.ini ./migrations.mysql.test
 
 .PHONY: migrations.pgsql.test
 migrations.pgsql.test: $(GO_SOURCES) generate-ini-pgsql
 	$(GO) test $(GOTESTFLAGS) -c code.gitea.io/gitea/tests/integration/migration-test -o migrations.pgsql.test
-	GITEA_TEST_CONF=tests/pgsql.ini ./migrations.pgsql.test
+	MOLTGIT_TEST_CONF=tests/pgsql.ini ./migrations.pgsql.test
 
 .PHONY: migrations.mssql.test
 migrations.mssql.test: $(GO_SOURCES) generate-ini-mssql
 	$(GO) test $(GOTESTFLAGS) -c code.gitea.io/gitea/tests/integration/migration-test -o migrations.mssql.test
-	GITEA_TEST_CONF=tests/mssql.ini ./migrations.mssql.test
+	MOLTGIT_TEST_CONF=tests/mssql.ini ./migrations.mssql.test
 
 .PHONY: migrations.sqlite.test
 migrations.sqlite.test: $(GO_SOURCES) generate-ini-sqlite
 	$(GO) test $(GOTESTFLAGS) -c code.gitea.io/gitea/tests/integration/migration-test -o migrations.sqlite.test -tags '$(TEST_TAGS)'
-	GITEA_TEST_CONF=tests/sqlite.ini ./migrations.sqlite.test
+	MOLTGIT_TEST_CONF=tests/sqlite.ini ./migrations.sqlite.test
 
 .PHONY: migrations.individual.mysql.test
 migrations.individual.mysql.test: $(GO_SOURCES)
-	GITEA_TEST_CONF=tests/mysql.ini $(GO) test $(GOTESTFLAGS) -tags='$(TEST_TAGS)' -p 1 $(MIGRATE_TEST_PACKAGES)
+	MOLTGIT_TEST_CONF=tests/mysql.ini $(GO) test $(GOTESTFLAGS) -tags='$(TEST_TAGS)' -p 1 $(MIGRATE_TEST_PACKAGES)
 
 .PHONY: migrations.individual.sqlite.test\#%
 migrations.individual.sqlite.test\#%: $(GO_SOURCES) generate-ini-sqlite
-	GITEA_TEST_CONF=tests/sqlite.ini $(GO) test $(GOTESTFLAGS) -tags '$(TEST_TAGS)' code.gitea.io/gitea/models/migrations/$*
+	MOLTGIT_TEST_CONF=tests/sqlite.ini $(GO) test $(GOTESTFLAGS) -tags '$(TEST_TAGS)' code.gitea.io/gitea/models/migrations/$*
 
 .PHONY: migrations.individual.pgsql.test
 migrations.individual.pgsql.test: $(GO_SOURCES)
-	GITEA_TEST_CONF=tests/pgsql.ini $(GO) test $(GOTESTFLAGS) -tags='$(TEST_TAGS)' -p 1 $(MIGRATE_TEST_PACKAGES)
+	MOLTGIT_TEST_CONF=tests/pgsql.ini $(GO) test $(GOTESTFLAGS) -tags='$(TEST_TAGS)' -p 1 $(MIGRATE_TEST_PACKAGES)
 
 .PHONY: migrations.individual.pgsql.test\#%
 migrations.individual.pgsql.test\#%: $(GO_SOURCES) generate-ini-pgsql
-	GITEA_TEST_CONF=tests/pgsql.ini $(GO) test $(GOTESTFLAGS) -tags '$(TEST_TAGS)' code.gitea.io/gitea/models/migrations/$*
+	MOLTGIT_TEST_CONF=tests/pgsql.ini $(GO) test $(GOTESTFLAGS) -tags '$(TEST_TAGS)' code.gitea.io/gitea/models/migrations/$*
 
 .PHONY: migrations.individual.mssql.test
 migrations.individual.mssql.test: $(GO_SOURCES) generate-ini-mssql
-	GITEA_TEST_CONF=tests/mssql.ini $(GO) test $(GOTESTFLAGS) -tags='$(TEST_TAGS)' -p 1 $(MIGRATE_TEST_PACKAGES)
+	MOLTGIT_TEST_CONF=tests/mssql.ini $(GO) test $(GOTESTFLAGS) -tags='$(TEST_TAGS)' -p 1 $(MIGRATE_TEST_PACKAGES)
 
 .PHONY: migrations.individual.mssql.test\#%
 migrations.individual.mssql.test\#%: $(GO_SOURCES) generate-ini-mssql
-	GITEA_TEST_CONF=tests/mssql.ini $(GO) test $(GOTESTFLAGS) -tags '$(TEST_TAGS)' code.gitea.io/gitea/models/migrations/$*
+	MOLTGIT_TEST_CONF=tests/mssql.ini $(GO) test $(GOTESTFLAGS) -tags '$(TEST_TAGS)' code.gitea.io/gitea/models/migrations/$*
 
 .PHONY: migrations.individual.sqlite.test
 migrations.individual.sqlite.test: $(GO_SOURCES) generate-ini-sqlite
-	GITEA_TEST_CONF=tests/sqlite.ini $(GO) test $(GOTESTFLAGS) -tags='$(TEST_TAGS)' -p 1 $(MIGRATE_TEST_PACKAGES)
+	MOLTGIT_TEST_CONF=tests/sqlite.ini $(GO) test $(GOTESTFLAGS) -tags='$(TEST_TAGS)' -p 1 $(MIGRATE_TEST_PACKAGES)
 
 .PHONY: migrations.individual.sqlite.test\#%
 migrations.individual.sqlite.test\#%: $(GO_SOURCES) generate-ini-sqlite
-	GITEA_TEST_CONF=tests/sqlite.ini $(GO) test $(GOTESTFLAGS) -tags '$(TEST_TAGS)' code.gitea.io/gitea/models/migrations/$*
+	MOLTGIT_TEST_CONF=tests/sqlite.ini $(GO) test $(GOTESTFLAGS) -tags '$(TEST_TAGS)' code.gitea.io/gitea/models/migrations/$*
 
 e2e.mysql.test: $(GO_SOURCES)
 	$(GO) test $(GOTESTFLAGS) -c code.gitea.io/gitea/tests/e2e -o e2e.mysql.test
@@ -772,22 +772,22 @@ $(DIST_DIRS):
 
 .PHONY: release-windows
 release-windows: | $(DIST_DIRS)
-	CGO_CFLAGS="$(CGO_CFLAGS)" $(GO) run $(XGO_PACKAGE) -go $(XGO_VERSION) -buildmode exe -dest $(DIST)/binaries -tags 'osusergo $(TAGS)' -ldflags '-s -w -linkmode external -extldflags "-static" $(LDFLAGS)' -targets 'windows/*' -out gitea-$(VERSION) .
+	CGO_CFLAGS="$(CGO_CFLAGS)" $(GO) run $(XGO_PACKAGE) -go $(XGO_VERSION) -buildmode exe -dest $(DIST)/binaries -tags 'osusergo $(TAGS)' -ldflags '-s -w -linkmode external -extldflags "-static" $(LDFLAGS)' -targets 'windows/*' -out moltgit-$(VERSION) .
 ifeq (,$(findstring gogit,$(TAGS)))
-	CGO_CFLAGS="$(CGO_CFLAGS)" $(GO) run $(XGO_PACKAGE) -go $(XGO_VERSION) -buildmode exe -dest $(DIST)/binaries -tags 'osusergo gogit $(TAGS)' -ldflags '-s -w -linkmode external -extldflags "-static" $(LDFLAGS)' -targets 'windows/*' -out gitea-$(VERSION)-gogit .
+	CGO_CFLAGS="$(CGO_CFLAGS)" $(GO) run $(XGO_PACKAGE) -go $(XGO_VERSION) -buildmode exe -dest $(DIST)/binaries -tags 'osusergo gogit $(TAGS)' -ldflags '-s -w -linkmode external -extldflags "-static" $(LDFLAGS)' -targets 'windows/*' -out moltgit-$(VERSION)-gogit .
 endif
 
 .PHONY: release-linux
 release-linux: | $(DIST_DIRS)
-	CGO_CFLAGS="$(CGO_CFLAGS)" $(GO) run $(XGO_PACKAGE) -go $(XGO_VERSION) -dest $(DIST)/binaries -tags 'netgo osusergo $(TAGS)' -ldflags '-s -w -linkmode external -extldflags "-static" $(LDFLAGS)' -targets '$(LINUX_ARCHS)' -out gitea-$(VERSION) .
+	CGO_CFLAGS="$(CGO_CFLAGS)" $(GO) run $(XGO_PACKAGE) -go $(XGO_VERSION) -dest $(DIST)/binaries -tags 'netgo osusergo $(TAGS)' -ldflags '-s -w -linkmode external -extldflags "-static" $(LDFLAGS)' -targets '$(LINUX_ARCHS)' -out moltgit-$(VERSION) .
 
 .PHONY: release-darwin
 release-darwin: | $(DIST_DIRS)
-	CGO_CFLAGS="$(CGO_CFLAGS)" $(GO) run $(XGO_PACKAGE) -go $(XGO_VERSION) -dest $(DIST)/binaries -tags 'netgo osusergo $(TAGS)' -ldflags '-s -w $(LDFLAGS)' -targets 'darwin-10.12/amd64,darwin-10.12/arm64' -out gitea-$(VERSION) .
+	CGO_CFLAGS="$(CGO_CFLAGS)" $(GO) run $(XGO_PACKAGE) -go $(XGO_VERSION) -dest $(DIST)/binaries -tags 'netgo osusergo $(TAGS)' -ldflags '-s -w $(LDFLAGS)' -targets 'darwin-10.12/amd64,darwin-10.12/arm64' -out moltgit-$(VERSION) .
 
 .PHONY: release-freebsd
 release-freebsd: | $(DIST_DIRS)
-	CGO_CFLAGS="$(CGO_CFLAGS)" $(GO) run $(XGO_PACKAGE) -go $(XGO_VERSION) -dest $(DIST)/binaries -tags 'netgo osusergo $(TAGS)' -ldflags '-s -w $(LDFLAGS)' -targets 'freebsd/amd64' -out gitea-$(VERSION) .
+	CGO_CFLAGS="$(CGO_CFLAGS)" $(GO) run $(XGO_PACKAGE) -go $(XGO_VERSION) -dest $(DIST)/binaries -tags 'netgo osusergo $(TAGS)' -ldflags '-s -w $(LDFLAGS)' -targets 'freebsd/amd64' -out moltgit-$(VERSION) .
 
 .PHONY: release-copy
 release-copy: | $(DIST_DIRS)
@@ -807,8 +807,8 @@ release-sources: | $(DIST_DIRS)
 # bsdtar needs a ^ to prevent matching subdirectories
 	$(eval EXCL := --exclude=$(shell tar --help | grep -q bsdtar && echo "^")./)
 # use transform to a add a release-folder prefix; in bsdtar the transform parameter equivalent is -s
-	$(eval TRANSFORM := $(shell tar --help | grep -q bsdtar && echo "-s '/^./gitea-src-$(VERSION)/'" || echo "--transform 's|^./|gitea-src-$(VERSION)/|'"))
-	tar $(addprefix $(EXCL),$(TAR_EXCLUDES)) $(TRANSFORM) -czf $(DIST)/release/gitea-src-$(VERSION).tar.gz .
+	$(eval TRANSFORM := $(shell tar --help | grep -q bsdtar && echo "-s '/^./moltgit-src-$(VERSION)/'" || echo "--transform 's|^./|moltgit-src-$(VERSION)/|'"))
+	tar $(addprefix $(EXCL),$(TAR_EXCLUDES)) $(TRANSFORM) -czf $(DIST)/release/moltgit-src-$(VERSION).tar.gz .
 	rm -f $(STORED_VERSION_FILE)
 
 .PHONY: deps
@@ -912,16 +912,16 @@ generate-images: | node_modules ## generate images
 
 .PHONY: generate-manpage
 generate-manpage: ## generate manpage
-	@[ -f gitea ] || make backend
+	@[ -f moltgit ] || make backend
 	@mkdir -p man/man1/ man/man5
-	@./gitea docs --man > man/man1/gitea.1
-	@gzip -9 man/man1/gitea.1 && echo man/man1/gitea.1.gz created
+	@./moltgit docs --man > man/man1/moltgit.1
+	@gzip -9 man/man1/moltgit.1 && echo man/man1/moltgit.1.gz created
 	@#TODO A small script that formats config-cheat-sheet.en-us.md nicely for use as a config man page
 
 .PHONY: docker
 docker:
 	docker build --disable-content-trust=false -t $(DOCKER_REF) .
-# support also build args docker build --build-arg GITEA_VERSION=v1.2.3 --build-arg TAGS="bindata sqlite sqlite_unlock_notify"  .
+# support also build args docker build --build-arg MOLTGIT_VERSION=v1.2.3 --build-arg TAGS="bindata sqlite sqlite_unlock_notify"  .
 
 # This endif closes the if at the top of the file
 endif

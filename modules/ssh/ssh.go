@@ -52,7 +52,7 @@ import (
 // it mitigates the misuse for most cases, it's still good for us to make sure we don't rely on that mitigation
 // and do not misuse the PublicKeyCallback: we should only use the verified keyID from the verified ssh conn.
 
-const giteaPermissionExtensionKeyID = "gitea-perm-ext-key-id"
+const moltgitPermissionExtensionKeyID = "moltgit-perm-ext-key-id"
 
 func getExitStatusFromError(err error) int {
 	if err == nil {
@@ -103,7 +103,7 @@ func sessionHandler(session ssh.Session) {
 	// here can't use session.Permissions() because it only uses the value from ctx, which might not be the authenticated one.
 	// so we must use the original ssh conn, which always contains the correct (verified) keyID.
 	sshSession := ptr[sessionPartial](session)
-	keyID := sshSession.conn.Permissions.Extensions[giteaPermissionExtensionKeyID]
+	keyID := sshSession.conn.Permissions.Extensions[moltgitPermissionExtensionKeyID]
 
 	command := session.RawCommand()
 
@@ -215,7 +215,7 @@ func publicKeyHandler(ctx ssh.Context, key ssh.PublicKey) bool {
 	ctx.Permissions().Permissions = &gossh.Permissions{}
 	setPermExt := func(keyID int64) {
 		ctx.Permissions().Permissions.Extensions = map[string]string{
-			giteaPermissionExtensionKeyID: strconv.FormatInt(keyID, 10),
+			moltgitPermissionExtensionKeyID: strconv.FormatInt(keyID, 10),
 		}
 	}
 

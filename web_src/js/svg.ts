@@ -1,11 +1,11 @@
 import {defineComponent, h, type PropType} from 'vue';
 import {parseDom, serializeXml} from './utils.ts';
 import {html, htmlRaw} from './utils/html.ts';
-import giteaDoubleChevronLeft from '../../public/assets/img/svg/gitea-double-chevron-left.svg';
-import giteaDoubleChevronRight from '../../public/assets/img/svg/gitea-double-chevron-right.svg';
-import giteaEmptyCheckbox from '../../public/assets/img/svg/gitea-empty-checkbox.svg';
-import giteaExclamation from '../../public/assets/img/svg/gitea-exclamation.svg';
-import giteaRunning from '../../public/assets/img/svg/gitea-running.svg';
+import giteaDoubleChevronLeft from '../../public/assets/img/svg/moltgit-double-chevron-left.svg';
+import giteaDoubleChevronRight from '../../public/assets/img/svg/moltgit-double-chevron-right.svg';
+import giteaEmptyCheckbox from '../../public/assets/img/svg/moltgit-empty-checkbox.svg';
+import giteaExclamation from '../../public/assets/img/svg/moltgit-exclamation.svg';
+import giteaRunning from '../../public/assets/img/svg/moltgit-running.svg';
 import octiconArchive from '../../public/assets/img/svg/octicon-archive.svg';
 import octiconArrowSwitch from '../../public/assets/img/svg/octicon-arrow-switch.svg';
 import octiconBlocked from '../../public/assets/img/svg/octicon-blocked.svg';
@@ -84,11 +84,11 @@ import octiconZoomIn from '../../public/assets/img/svg/octicon-zoom-in.svg';
 import octiconZoomOut from '../../public/assets/img/svg/octicon-zoom-out.svg';
 
 const svgs = {
-  'gitea-double-chevron-left': giteaDoubleChevronLeft,
-  'gitea-double-chevron-right': giteaDoubleChevronRight,
-  'gitea-empty-checkbox': giteaEmptyCheckbox,
-  'gitea-exclamation': giteaExclamation,
-  'gitea-running': giteaRunning,
+  'moltgit-double-chevron-left': giteaDoubleChevronLeft,
+  'moltgit-double-chevron-right': giteaDoubleChevronRight,
+  'moltgit-empty-checkbox': giteaEmptyCheckbox,
+  'moltgit-exclamation': giteaExclamation,
+  'moltgit-running': giteaRunning,
   'octicon-archive': octiconArchive,
   'octicon-arrow-switch': octiconArrowSwitch,
   'octicon-blocked': octiconBlocked,

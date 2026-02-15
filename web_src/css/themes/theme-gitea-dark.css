@@ -1,7 +1,7 @@
 @import "../chroma/dark.css";
 @import "../codemirror/dark.css";
 
-gitea-theme-meta-info {
+moltgit-theme-meta-info {
   --theme-display-name: "Dark";
   --theme-color-scheme: "dark";
 }

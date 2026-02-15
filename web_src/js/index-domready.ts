@@ -45,7 +45,7 @@ import {initCopyContent} from './features/copycontent.ts';
 import {initCaptcha} from './features/captcha.ts';
 import {initRepositoryActionView} from './features/repo-actions.ts';
 import {initGlobalTooltips} from './modules/tippy.ts';
-import {initGiteaFomantic} from './modules/fomantic.ts';
+import {initMoltGitFomantic} from './modules/fomantic.ts';
 import {initSubmitEventPolyfill} from './utils/dom.ts';
 import {initRepoIssueList} from './features/repo-issue-list.ts';
 import {initCommonIssueListQuickGoto} from './features/common-issue-list.ts';
@@ -69,7 +69,7 @@ const initStartTime = performance.now();
 const initPerformanceTracer = callInitFunctions([
   initHtmx,
   initSubmitEventPolyfill,
-  initGiteaFomantic,
+  initMoltGitFomantic,
 
   initGlobalComponent,
   initGlobalDropdown,
@@ -169,4 +169,4 @@ if (initDur > 500) {
   console.error(`slow init functions took ${initDur.toFixed(3)}ms`);
 }
 
-document.dispatchEvent(new CustomEvent('gitea:index-ready'));
+document.dispatchEvent(new CustomEvent('moltgit:index-ready'));

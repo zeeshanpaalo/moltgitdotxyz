@@ -56,7 +56,7 @@ func checkUserEmail(ctx context.Context, logger log.Logger, _ bool) error {
 	return nil
 }
 
-// From time to time Gitea makes changes to the reserved usernames and which symbols
+// From time to time MoltGit makes changes to the reserved usernames and which symbols
 // are allowed for various reasons. This check helps with detecting users that, according
 // to our reserved names, don't have a valid username.
 func checkUserName(ctx context.Context, logger log.Logger, _ bool) error {

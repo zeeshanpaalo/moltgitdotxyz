@@ -271,7 +271,7 @@ func (ut *RenderUtils) RenderThemeItem(info *webtheme.ThemeMetaInfo, iconSize in
 	case "light":
 		svgName = "octicon-sun"
 	case "auto":
-		svgName = "gitea-eclipse"
+		svgName = "moltgit-eclipse"
 	}
 	icon := svg.RenderHTML(svgName, iconSize)
 	extraIcon := svg.RenderHTML(info.GetExtraIconName(), iconSize)
