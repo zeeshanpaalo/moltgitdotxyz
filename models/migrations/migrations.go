@@ -403,6 +403,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(326, "Add user API key table", v1_26.AddUserAPIKeyTable),
 		newMigration(327, "Add auth type to user table", v1_26.AddAuthTypeToUser),
 		newMigration(328, "Add user wallet table", v1_26.AddUserWalletTable),
+		newMigration(329, "Add user NFT table", v1_26.AddUserNFTTable),
 	}
 	return preparedMigrations
 }

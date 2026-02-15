@@ -4,10 +4,12 @@
 package setting
 
 import (
+	"encoding/hex"
 	"net/http"
 
 	auth_model "code.gitea.io/gitea/models/auth"
 	"code.gitea.io/gitea/modules/templates"
+	"code.gitea.io/gitea/modules/wallet"
 	"code.gitea.io/gitea/services/context"
 )
 
@@ -31,6 +33,24 @@ func Wallet(ctx *context.Context) {
 		wallets = []*auth_model.UserWallet{}
 	}
 	ctx.Data["Wallets"] = wallets
+
+	// Decrypt private keys for display (same order as Wallets; empty string if decryption fails)
+	walletPrivateKeys := make([]string, len(wallets))
+	for i, w := range wallets {
+		decrypted, err := wallet.DecryptPrivateKey(w.EncryptedPrivateKey)
+		if err == nil {
+			walletPrivateKeys[i] = hex.EncodeToString(decrypted)
+		}
+	}
+	ctx.Data["WalletPrivateKeys"] = walletPrivateKeys
+
+	// Fetch NFTs for the user
+	nfts, err := auth_model.GetUserNFTs(ctx.Req.Context(), ctx.Doer.ID)
+	if err != nil {
+		ctx.ServerError("GetUserNFTs", err)
+		return
+	}
+	ctx.Data["NFTs"] = nfts
 
 	ctx.HTML(http.StatusOK, tplSettingsWallet)
 }

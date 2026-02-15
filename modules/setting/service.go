@@ -110,6 +110,16 @@ var Service = struct {
 	APIKey struct {
 		Environment string // "production" or "development"
 	}
+
+	// Blockchain settings
+	Blockchain struct {
+		Enabled         bool
+		RPCURL          string // Monad RPC URL
+		PrivateKey      string // Private key of the server wallet (pays gas)
+		ContractAddress string // Deployed NFT contract address
+		Environment     string // "mainnet" or "testnet"
+		ChainID         int64  // Chain ID (e.g. 143 for Monad testnet)
+	}
 }{
 	AllowedUserVisibilityModesSlice: []bool{true, true, true},
 }
@@ -269,6 +279,7 @@ func loadServiceFrom(rootCfg ConfigProvider) {
 	loadOpenIDSetting(rootCfg)
 	loadQosSetting(rootCfg)
 	loadAPIKeySetting(rootCfg)
+	loadBlockchainSetting(rootCfg)
 }
 
 func loadOpenIDSetting(rootCfg ConfigProvider) {
@@ -306,5 +317,30 @@ func loadAPIKeySetting(rootCfg ConfigProvider) {
 	if Service.APIKey.Environment != "production" && Service.APIKey.Environment != "development" {
 		log.Warn("Invalid APIKEY_ENVIRONMENT value '%s', defaulting to 'development'", Service.APIKey.Environment)
 		Service.APIKey.Environment = "development"
+	}
+}
+
+func loadBlockchainSetting(rootCfg ConfigProvider) {
+	sec := rootCfg.Section("blockchain")
+	Service.Blockchain.Enabled = sec.Key("ENABLED").MustBool(false)
+	Service.Blockchain.RPCURL = sec.Key("RPC_URL").MustString("")
+	Service.Blockchain.PrivateKey = sec.Key("PRIVATE_KEY").MustString("")
+	Service.Blockchain.ContractAddress = sec.Key("CONTRACT_ADDRESS").MustString("")
+	Service.Blockchain.Environment = sec.Key("ENVIRONMENT").MustString("testnet")
+	Service.Blockchain.ChainID = sec.Key("CHAIN_ID").MustInt64(143)
+
+	if Service.Blockchain.Enabled {
+		if Service.Blockchain.RPCURL == "" {
+			log.Warn("Blockchain is enabled but RPC_URL is not set, disabling blockchain features")
+			Service.Blockchain.Enabled = false
+		}
+		if Service.Blockchain.PrivateKey == "" {
+			log.Warn("Blockchain is enabled but PRIVATE_KEY is not set, disabling blockchain features")
+			Service.Blockchain.Enabled = false
+		}
+		if Service.Blockchain.ContractAddress == "" {
+			log.Warn("Blockchain is enabled but CONTRACT_ADDRESS is not set, disabling blockchain features")
+			Service.Blockchain.Enabled = false
+		}
 	}
 }

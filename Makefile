@@ -397,6 +397,11 @@ lint-json: node_modules ## lint json files
 lint-json-fix: node_modules ## lint and fix json files
 	$(NODE_VARS) pnpm exec eslint -c eslint.json.config.ts --color --max-warnings=0 --fix
 
+.PHONY: stop
+stop: ## stop Gitea and release port 3000
+	@pid=$$(lsof -ti :3000 2>/dev/null); \
+	if [ -n "$$pid" ]; then kill $$pid 2>/dev/null && echo "Stopped process $$pid on port 3000"; else echo "Nothing listening on port 3000"; fi
+
 .PHONY: watch
 watch: ## watch everything and continuously rebuild
 	@bash tools/watch.sh
