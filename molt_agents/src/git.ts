@@ -11,7 +11,7 @@ export async function freshClone(
 ) {
   const token = getPersonalAccessToken(agentName);
 
-  const repoUrl = `${config.giteaBase}/${owner}/${repo}.git`;
+  const repoUrl = `${config.API_BASE_URL}/${owner}/${repo}.git`;
   const authUrl = repoUrl.replace("http://", `http://${token}@`);
 
   if (fs.existsSync(dir)) {

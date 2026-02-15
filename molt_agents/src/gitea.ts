@@ -6,33 +6,36 @@ function client(agentName: string) {
   const token = getToken(agentName);
 
   return axios.create({
-    baseURL: `${config.giteaBase}/api/v1`,
+    baseURL: `${config.API_BASE_URL}/api/v1`,
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 }
 
-export async function createRepo(name: string, description: string) {
-  const res = await client("planner-1").post(`/user/repos`, {
+export async function createRepo(
+  name: string,
+  description: string,
+  owner,
+  reviewer: string,
+) {
+  const res = await client(owner).post(`/user/repos`, {
     name,
     description,
     private: false,
     auto_init: true,
   });
 
-  // console.log(res.data)
-  // TODO: after creating repo, we need to add reviewer-1 as collaborator so it can review PRs, comment and merge them.
-  await client("planner-1").put(
-    `/repos/${res.data.owner.username}/${res.data.name}/collaborators/reviewer-1`,
-  ); // what is owner.login vs owner.username in gitea response?
-  // todo what is owner.login vs owner.username in gitea response?
+  // After creating repo, we need to add 1 as collaborator so it can review PRs, comment and merge them.
+  await client(owner).put(
+    `/repos/${res.data.owner.username}/${res.data.name}/collaborators/${reviewer}`,
+  );
 
   return res.data;
 }
 
 export async function searchReposWithIssues() {
-  const res = await client("builder-1").get(
+  const res = await client(config.builderAgentName).get(
     `/repos/search?has_issues=true&is_private=false&limit=50`,
   );
 
@@ -41,8 +44,12 @@ export async function searchReposWithIssues() {
   return res.data.data; // Gitea returns { ok, data }
 }
 
-export async function getIssuesForRepo(owner: string, repo: string) {
-  const res = await client("builder-1").get(
+export async function getIssuesForRepo(
+  owner: string,
+  repo: string,
+  builderName: string,
+) {
+  const res = await client(builderName).get(
     `/repos/${owner}/${repo}/issues?state=open`,
   );
 
@@ -55,7 +62,7 @@ export async function createIssue(
   issuesCreator: string,
   repo: string,
 ) {
-  await client("planner-1").post(`/repos/${issuesCreator}/${repo}/issues`, {
+  await client(issuesCreator).post(`/repos/${issuesCreator}/${repo}/issues`, {
     title,
     body,
   });
@@ -69,7 +76,7 @@ export async function createPR(
   forkOwner?: string,
   body?: string,
 ) {
-  const agentName = "builder-1"; // todo: read this from config or env
+  const agentName = config.builderAgentName; //
   const api = client(agentName);
 
   try {
@@ -96,13 +103,15 @@ export async function createPR(
 
 // List all repos reviewer has access to
 export async function getAllReposForReviewer() {
-  const res = await client("reviewer-1").get(`/user/repos?limit=100`);
+  const res = await client(config.reviewerAgentName).get(
+    `/user/repos?limit=100`,
+  );
   return res.data; // returns array of { owner, name, ... }
 }
 
 // Get all PRs for a given repo
 export async function getPRs(owner: string, repo: string) {
-  const res = await client("reviewer-1").get(
+  const res = await client(config.reviewerAgentName).get(
     `/repos/${owner}/${repo}/pulls?state=open`,
   );
   return res.data;
@@ -114,21 +123,21 @@ export async function commentPR(
   prNumber: number,
   body: string,
 ) {
-  await client("reviewer-1").post(
+  await client(config.reviewerAgentName).post(
     `/repos/${owner}/${repo}/issues/${prNumber}/comments`,
     { body },
   );
 }
 
 export async function mergePR(owner: string, repo: string, prNumber: number) {
-  await client("reviewer-1").post(
+  await client(config.reviewerAgentName).post(
     `/repos/${owner}/${repo}/pulls/${prNumber}/merge`,
     { Do: "merge" },
   );
 }
 
 export async function forkRepo(owner: string, repo: string) {
-  const agentName = "builder-1";
+  const agentName = config.builderAgentName;
   const username = agentName;
   const api = client(agentName);
 

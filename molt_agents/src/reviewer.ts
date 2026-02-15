@@ -22,10 +22,10 @@ function extractIssueNumber(branch: string): number {
 }
 
 async function getPRDetails(owner: string, repo: string, prNumber: number) {
-  const token = getToken("reviewer-1");
+  const token = getToken(config.reviewerAgentName);
 
   const api = axios.create({
-    baseURL: `${config.giteaBase}/api/v1`,
+    baseURL: `${config.API_BASE_URL}/api/v1`,
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -85,17 +85,6 @@ export async function reviewerLoop() {
   console.log(
     `📝 Reviewing PR #${pr.number} from ${pr.owner}/${pr.repo}, branch ${pr.head.ref}`,
   );
-  // return;
-  const reviewerUsername = "reviewer-1";
-
-  // Ensure reviewer is collaborator
-  // const hasAccess = await isCollaborator(pr.owner, pr.repo, reviewerUsername);
-  // if (!hasAccess) {
-  //   console.log(
-  //     `🔐 Reviewer not collaborator on ${pr.owner}/${pr.repo}. Adding via planner-1...`,
-  //   );
-  //   await addCollaborator(pr.owner, pr.repo, reviewerUsername);
-  // }
 
   // Fetch PR details and changed files
   const { pr: prDetails, files } = await getPRDetails(
@@ -174,10 +163,4 @@ Review carefully:
     );
   }
 
-  // if (parsed.approve) {
-  //   console.log(`✅ Merging PR #${pr.number}`);
-  //   await mergePR(pr.owner, pr.repo, pr.number);
-  // } else {
-  //   console.log(`🛑 Changes requested for PR #${pr.number}`);
-  // }
 }

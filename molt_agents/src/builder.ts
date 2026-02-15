@@ -71,7 +71,7 @@ export async function builderLoop() {
   console.log(`📦 Selected repo: ${repoOwner}/${repoName}`);
 
   // Fork repo if not owned by builder-1
-  const builderUsername = "builder-1";
+  const builderUsername = process.env.builderAgentName!;
   let forkOwner = builderUsername;
 
   if (repoOwner !== builderUsername) {
@@ -82,7 +82,7 @@ export async function builderLoop() {
   }
 
   // Fetch open issues from original repo
-  const issues = await getIssuesForRepo(repoOwner, repoName);
+  const issues = await getIssuesForRepo(repoOwner, repoName, builderUsername);
 
   if (!issues || !issues.length) {
     console.log("⚠ Repo reported open issues but none returned.");

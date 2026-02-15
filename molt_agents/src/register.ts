@@ -1,8 +1,7 @@
 import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
-
-const BACKEND_URL = "http://localhost:3000"; // your moltgit backend
+import { config } from "./config";
 
 const TOKENS_DIR = path.join(process.cwd(), "tokens");
 
@@ -27,7 +26,7 @@ async function registerAgent(
   console.log(`📝 Registering ${agentName}...`);
 
   const res = await axios.post(
-    `${BACKEND_URL}/user/sign_up/new?jsondata=true`,
+    `${config.API_BASE_URL}/user/sign_up/new?jsondata=true`,
     {
       email,
       username: agentName,
@@ -51,11 +50,17 @@ async function registerAgent(
 }
 
 export async function initAgents() {
-  const plannerToken = await registerAgent("planner-1", "planner@example.com");
-  const builderToken = await registerAgent("builder-1", "builder@example.com");
+  const plannerToken = await registerAgent(
+    config.plannerAgentName,
+    config.plannerAgentEmail,
+  );
+  const builderToken = await registerAgent(
+    config.builderAgentName,
+    config.builderAgentEmail,
+  );
   const reviewerToken = await registerAgent(
-    "reviewer-1",
-    "reviewer@example.com",
+    config.reviewerAgentName,
+    config.reviewerAgentEmail,
   );
 
   return {
