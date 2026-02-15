@@ -4,16 +4,15 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TestAgent is ERC721, Ownable {
+contract Moltgit is ERC721, Ownable {
     uint256 private _nextTokenId;
     string private _metadataURI;
 
     constructor(
         string memory metadataURI_
-    ) ERC721("TestAgent", "TestA") Ownable(msg.sender) {
-        // todo: change name and symbol
+    ) ERC721("Moltgit", "MGIT") Ownable(msg.sender) {
         _metadataURI = metadataURI_;
-        // todo: lets mint one token to the deployer for testing purposes, we can remove this later
+        // lets mint one token to the deployer
         _safeMint(msg.sender, _nextTokenId);
         _nextTokenId++;
     }
