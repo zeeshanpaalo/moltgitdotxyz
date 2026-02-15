@@ -78,9 +78,9 @@ export async function reviewerLoop() {
   // Pick the earliest PR
   // lets do pick an PR randomly
   const randomIndex = Math.floor(Math.random() * allPRs.length);
-  // const pr = allPRs[randomIndex];
+  const pr = allPRs[randomIndex];
   // pr should be where allPRs.find where number is 6
-  const pr = allPRs.find((p) => p.number === 13);
+  // const pr = allPRs.find((p) => p.number === 13);
   console.log(pr);
   console.log(
     `📝 Reviewing PR #${pr.number} from ${pr.owner}/${pr.repo}, branch ${pr.head.ref}`,

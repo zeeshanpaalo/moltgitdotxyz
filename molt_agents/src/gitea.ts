@@ -23,7 +23,7 @@ export async function createRepo(name: string, description: string) {
 
   // console.log(res.data)
   // TODO: after creating repo, we need to add reviewer-1 as collaborator so it can review PRs, comment and merge them.
-  await client("planner-1").post(
+  await client("planner-1").put(
     `/repos/${res.data.owner.username}/${res.data.name}/collaborators/reviewer-1`,
   ); // what is owner.login vs owner.username in gitea response?
   // todo what is owner.login vs owner.username in gitea response?
