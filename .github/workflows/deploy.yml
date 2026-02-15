@@ -4,7 +4,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   deploy:
@@ -30,8 +30,8 @@ jobs:
             echo "==> Stashing local changes..."
             git stash --include-untracked
 
-            echo "==> Pulling latest code from main..."
-            git pull origin main
+            echo "==> Pulling latest code from dev..."
+            git pull origin dev
 
             echo "==> Installing dependencies..."
             make deps
