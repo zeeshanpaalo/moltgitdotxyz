@@ -7,7 +7,12 @@ import {
   createPR,
   forkRepo,
 } from "./gitea";
-import { freshClone, commitAndPush } from "./git";
+import {
+  freshClone,
+  syncForkWithUpstream,
+  createBranch,
+  commitAndPush,
+} from "./git";
 
 /**
  * 📖 Recursively read full repository codebase
@@ -48,12 +53,11 @@ export async function builderLoop() {
 
   const repos: any[] = await searchReposWithIssues();
 
-  if (!repos || !repos.length) {
+  if (!repos?.length) {
     console.log("😴 No repos found.");
     return;
   }
 
-  // Filter repos that actually have open issues
   const reposWithOpenIssues = repos.filter(
     (repo: any) => repo.open_issues_count > 0,
   );
@@ -63,14 +67,12 @@ export async function builderLoop() {
     return;
   }
 
-  // Pick ONE repo randomly
   const selectedRepo = pickRandom(reposWithOpenIssues);
   const repoOwner = selectedRepo.owner.login;
   const repoName = selectedRepo.name;
 
   console.log(`📦 Selected repo: ${repoOwner}/${repoName}`);
 
-  // Fork repo if not owned by builder-1
   const builderUsername = process.env.builderAgentName!;
   let forkOwner = builderUsername;
 
@@ -78,44 +80,42 @@ export async function builderLoop() {
     console.log(`🍴 Forking repo into ${builderUsername} namespace...`);
     const fork = await forkRepo(repoOwner, repoName);
     forkOwner = fork.owner.login;
-    console.log(`✅ Fork created: ${forkOwner}/${repoName}`);
+    console.log(`✅ Fork ready: ${forkOwner}/${repoName}`);
   }
 
-  // Fetch open issues from original repo
   const issues = await getIssuesForRepo(repoOwner, repoName, builderUsername);
 
-  if (!issues || !issues.length) {
+  if (!issues?.length) {
     console.log("⚠ Repo reported open issues but none returned.");
     return;
   }
 
-  // Pick ONE issue randomly
   const issue: any = pickRandom(issues);
-  // console.log(issues)
-  // const issue: any = issues[0]; // for testing, always pick first issue
-  // pick where issue.id === 1 for testing
-  //todo filteron issue.id === 1 for testing or find
-  // const issue = issues.find((i: any) => i.id === 1);
-  console.log(issue);
   console.log(`🛠 Working on issue #${issue.number}: ${issue.title}`);
 
   const random = Math.floor(Math.random() * 10000);
   const branch = `issue-${issue.number}-${Date.now()}-${random}`;
   const dir = `./workspace-${repoName}`;
 
-  // Clone fork (builder-1 owns this fork)
+  // Clone fork
   await freshClone(dir, builderUsername, forkOwner, repoName);
 
-  // Read entire codebase
+  // Sync fork with upstream
+  await syncForkWithUpstream(dir, repoOwner, repoName);
+
+  // Create feature branch
+  await createBranch(dir, branch);
+
+  // Read updated codebase
   const codebase = readCodebase(dir);
   const isEmpty = codebase.trim().length === 0;
+
   console.log(
     isEmpty
       ? "📁 Repository is empty. Will create boilerplate."
       : "📚 Codebase read successfully.",
   );
 
-  // Ask LLM to implement solution
   const system = "You are a senior autonomous software engineer.";
 
   const user = `
@@ -146,22 +146,31 @@ Return STRICT JSON:
 `;
 
   const output = await askLLM(system, user);
-  const parsed = JSON.parse(output);
 
-  // Write files
+  let parsed;
+  try {
+    parsed = JSON.parse(output);
+  } catch {
+    console.log("❌ LLM returned invalid JSON.");
+    return;
+  }
+
+  if (!parsed.files?.length) {
+    console.log("⚠ No files returned by LLM.");
+    return;
+  }
+
   for (const file of parsed.files) {
     const fullPath = path.join(dir, file.path);
     fs.mkdirSync(path.dirname(fullPath), { recursive: true });
     fs.writeFileSync(fullPath, file.content);
   }
 
-  // Commit & push branch to fork
   await commitAndPush(dir, branch, parsed.commit_message);
 
-  // Create PR from fork -> original repo
   await createPR(repoOwner, repoName, issue.title, branch, forkOwner);
 
   console.log(
-    `✅ PR created from ${forkOwner}/${repoName} -> ${repoOwner}/${repoName}`,
+    `✅ PR created from ${forkOwner}/${repoName}:${branch} -> ${repoOwner}/${repoName}`,
   );
 }
