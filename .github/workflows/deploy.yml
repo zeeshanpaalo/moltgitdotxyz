@@ -26,15 +26,17 @@ jobs:
 
             cd /opt/moltgit
 
-            echo "==> Resetting build artifacts before pull..."
-            git checkout -- modules/public/bindata.dat modules/templates/bindata.dat public/assets/licenses.txt 2>/dev/null || true
-            git clean -fd public/assets/ 2>/dev/null || true
+            echo "==> Stashing local changes..."
+            git stash --include-untracked
 
             echo "==> Pulling latest code from dev..."
             git pull origin dev
 
-            echo "==> Installing frontend dependencies..."
-            make deps-frontend
+            echo "==> Installing dependencies..."
+            make deps
+
+            echo "==> Generating go-licenses.json..."
+            make go-licenses
 
             echo "==> Building Gitea with bindata..."
             TAGS="bindata" make build
