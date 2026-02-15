@@ -54,7 +54,7 @@ var (
 		AllowForkWithoutMaximumLimit            bool
 		AllowForkIntoSameOwner                  bool
 
-		// StreamArchives makes Gitea stream git archive files to the client directly instead of creating an archive first.
+		// StreamArchives makes MoltGit stream git archive files to the client directly instead of creating an archive first.
 		// Ideally all users should use this streaming method. However, at the moment we don't know whether there are
 		// any users who still need the old behavior, so we introduce this option, intentionally not documenting it.
 		// After one or two releases, if no one complains, we will remove this option and always use streaming.
@@ -284,7 +284,7 @@ func loadRepositoryFrom(rootCfg ConfigProvider) {
 	Repository.GoGetCloneURLProtocol = sec.Key("GO_GET_CLONE_URL_PROTOCOL").MustString("https")
 	Repository.MaxCreationLimit = sec.Key("MAX_CREATION_LIMIT").MustInt(-1)
 	Repository.DefaultBranch = sec.Key("DEFAULT_BRANCH").MustString(Repository.DefaultBranch)
-	RepoRootPath = sec.Key("ROOT").MustString(filepath.Join(AppDataPath, "gitea-repositories"))
+	RepoRootPath = sec.Key("ROOT").MustString(filepath.Join(AppDataPath, "moltgit-repositories"))
 	if !filepath.IsAbs(RepoRootPath) {
 		RepoRootPath = filepath.Join(AppWorkPath, RepoRootPath)
 	} else {

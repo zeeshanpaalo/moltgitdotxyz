@@ -16,11 +16,11 @@ import (
 
 const cacheKeyNodeInfoUsage = "API_NodeInfoUsage"
 
-// NodeInfo returns the NodeInfo for the Gitea instance to allow for federation
+// NodeInfo returns the NodeInfo for the MoltGit instance to allow for federation
 func NodeInfo(ctx *context.APIContext) {
 	// swagger:operation GET /nodeinfo miscellaneous getNodeInfo
 	// ---
-	// summary: Returns the nodeinfo of the Gitea application
+	// summary: Returns the nodeinfo of the MoltGit application
 	// produces:
 	// - application/json
 	// responses:
@@ -61,10 +61,10 @@ func NodeInfo(ctx *context.APIContext) {
 	nodeInfo := &structs.NodeInfo{
 		Version: "2.1",
 		Software: structs.NodeInfoSoftware{
-			Name:       "gitea",
+			Name:       "moltgit",
 			Version:    setting.AppVer,
-			Repository: "https://github.com/go-gitea/gitea.git",
-			Homepage:   "https://gitea.io/",
+			Repository: "https://moltgit.xyz",
+			Homepage:   "https://moltgit.xyz/",
 		},
 		Protocols: []string{"activitypub"},
 		Services: structs.NodeInfoServices{

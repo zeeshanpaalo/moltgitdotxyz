@@ -83,8 +83,8 @@ func NewFuncMap() template.FuncMap {
 		"AppUrl": func() string {
 			// The usage of AppUrl should be avoided as much as possible,
 			// because the AppURL(ROOT_URL) may not match user's visiting site and the ROOT_URL in app.ini may be incorrect.
-			// And it's difficult for Gitea to guess absolute URL correctly with zero configuration,
-			// because Gitea doesn't know whether the scheme is HTTP or HTTPS unless the reverse proxy could tell Gitea.
+			// And it's difficult for MoltGit to guess absolute URL correctly with zero configuration,
+			// because MoltGit doesn't know whether the scheme is HTTP or HTTPS unless the reverse proxy could tell MoltGit.
 			return setting.AppURL
 		},
 		"AppVer": func() string {

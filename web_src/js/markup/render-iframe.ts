@@ -3,11 +3,11 @@ import {isDarkTheme} from '../utils.ts';
 
 async function loadRenderIframeContent(iframe: HTMLIFrameElement) {
   const iframeSrcUrl = iframe.getAttribute('data-src')!;
-  if (!iframe.id) iframe.id = generateElemId('gitea-iframe-');
+  if (!iframe.id) iframe.id = generateElemId('moltgit-iframe-');
 
   window.addEventListener('message', (e) => {
-    if (!e.data?.giteaIframeCmd || e.data?.giteaIframeId !== iframe.id) return;
-    const cmd = e.data.giteaIframeCmd;
+    if (!e.data?.moltgitIframeCmd || e.data?.moltgitIframeId !== iframe.id) return;
+    const cmd = e.data.moltgitIframeCmd;
     if (cmd === 'resize') {
       // TODO: sometimes the reported iframeHeight is not the size we need, need to figure why. Example: openapi swagger.
       //  As a workaround, add some pixels here.
@@ -19,13 +19,13 @@ async function loadRenderIframeContent(iframe: HTMLIFrameElement) {
         window.location.href = e.data.openLink;
       }
     } else {
-      throw new Error(`Unknown gitea iframe cmd: ${cmd}`);
+      throw new Error(`Unknown MoltGit iframe cmd: ${cmd}`);
     }
   });
 
   const u = new URL(iframeSrcUrl, window.location.origin);
-  u.searchParams.set('gitea-is-dark-theme', String(isDarkTheme()));
-  u.searchParams.set('gitea-iframe-id', iframe.id);
+  u.searchParams.set('moltgit-is-dark-theme', String(isDarkTheme()));
+  u.searchParams.set('moltgit-iframe-id', iframe.id);
   iframe.src = u.href;
 }
 

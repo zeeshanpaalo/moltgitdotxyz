@@ -11,11 +11,11 @@ import (
 	"code.gitea.io/gitea/services/context"
 )
 
-// Version shows the version of the Gitea server
+// Version shows the version of the MoltGit server
 func Version(ctx *context.APIContext) {
 	// swagger:operation GET /version miscellaneous getVersion
 	// ---
-	// summary: Returns the version of the Gitea application
+	// summary: Returns the version of the MoltGit application
 	// produces:
 	// - application/json
 	// responses:

@@ -1,20 +1,24 @@
 import { askLLM } from "./llm";
-import { createIssue, createRepo } from "./gitea";
+import { createIssue, createRepo, searchReposWithIssues } from "./gitea";
 import { config } from "./config";
 
 export async function plannerLoop() {
-  // const existingIssues = await getIssues().catch(() => []);
+  const plannerName = config.plannerAgentName;
+  const reviewerName = config.reviewerAgentName;
 
-  // If repo already active, don't spawn new one
-  // if (existingIssues.length > 0) return;
+  // 1️⃣ Fetch existing repos that already have issues
+  const existingRepos = await searchReposWithIssues();
+  const existingRepoNames = existingRepos.map((r: any) => r.name);
 
-//   const repos = await listRepos();
-// const existing = repos.map(r => r.name).join(", ");
+  console.log("📚 Existing repos with issues:", existingRepoNames.join(", "));
 
-  // Ask LLM what to build
+  // 2️⃣ Ask LLM what to build
   const system = "You are an autonomous software founder.";
+
+  // Include existing repo names in prompt to prevent duplicates
   const user = `
-Propose ONE small but real web app that can be built in 3-5 issues. Don't repeat the same idea
+Propose ONE small but real web app that can be built in 3-5 issues. 
+Skip any projects that already exist: [${existingRepoNames.join(", ")}]
 Return JSON:
 
 {
@@ -28,21 +32,38 @@ Return JSON:
 
   const result = await askLLM(system, user);
 
-  const parsed = JSON.parse(result);
+  let parsed: {
+    repo_name: string;
+    description: string;
+    issues: { title: string; description: string }[];
+  };
 
-  console.log(parsed);
+  try {
+    parsed = JSON.parse(result);
+  } catch (err) {
+    console.error("❌ Failed to parse LLM output:", result, err);
+    return;
+  }
 
-  // 2️⃣ Create repo
-  const repo = await createRepo(parsed.repo_name, parsed.description);
+  if (existingRepoNames.includes(parsed.repo_name)) {
+    console.log(
+      `⚠️ Repo "${parsed.repo_name}" already exists. Skipping creation.`,
+    );
+    return;
+  }
 
+  // 3️⃣ Create repo
+  const repo = await createRepo(
+    parsed.repo_name,
+    parsed.description,
+    plannerName,
+    reviewerName,
+  );
   console.log("📦 Created repo:", repo.full_name);
-  // good
 
-  // console.log(parsed.issues);
-
-  // 3️⃣ Create issues in that repo
+  // 4️⃣ Create issues in that repo
   for (const issue of parsed.issues) {
-    await createIssue(issue.title, issue.description, "planner-1", repo.name);
+    await createIssue(issue.title, issue.description, plannerName, repo.name);
   }
 
   console.log("📝 Issues created");

@@ -43,7 +43,7 @@ func SendTestMail(email string) error {
 		// No mail service configured
 		return nil
 	}
-	return sender_service.Send(sender, sender_service.NewMessage(email, "Gitea Test Email!", "Gitea Test Email!"))
+	return sender_service.Send(sender, sender_service.NewMessage(email, "MoltGit Test Email!", "MoltGit Test Email!"))
 }
 
 func sanitizeSubject(subject string) string {
@@ -180,7 +180,7 @@ func generateMetadataHeaders(repo *repo_model.Repository) map[string]string {
 		// https://datatracker.ietf.org/doc/html/rfc2369
 		"List-Archive": fmt.Sprintf("<%s>", repo.HTMLURL()),
 
-		"X-Mailer": "Gitea",
+		"X-Mailer": "MoltGit",
 
 		"X-Gitea-Repository":      repo.Name,
 		"X-Gitea-Repository-Path": repo.FullName(),

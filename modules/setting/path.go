@@ -15,14 +15,14 @@ import (
 )
 
 var (
-	// AppPath represents the path to the gitea binary
+	// AppPath represents the path to the moltgit binary
 	AppPath string
 
-	// AppWorkPath is the "working directory" of Gitea. It maps to the: WORK_PATH in app.ini, "--work-path" flag, environment variable GITEA_WORK_DIR.
+	// AppWorkPath is the "working directory" of MoltGit. It maps to the: WORK_PATH in app.ini, "--work-path" flag, environment variable MOLTGIT_WORK_DIR.
 	// If that is not set it is the default set here by the linker or failing that the directory of AppPath.
 	// It is used as the base path for several other paths.
 	AppWorkPath string
-	CustomPath  string // Custom directory path. Env: GITEA_CUSTOM
+	CustomPath  string // Custom directory path. Env: MOLTGIT_CUSTOM
 	CustomConf  string
 
 	appWorkPathBuiltin string
@@ -122,19 +122,19 @@ func InitWorkPathAndCfgProvider(getEnvFn func(name string) string, args ArgWorkP
 	}
 
 	readFromEnv := func() {
-		envWorkPath := getEnvFn("GITEA_WORK_DIR")
+		envWorkPath := getEnvFn("MOLTGIT_WORK_DIR")
 		if envWorkPath != "" {
 			tmpWorkPath.Set(envWorkPath)
 			if !filepath.IsAbs(tmpWorkPath.Value) {
-				log.Fatal("GITEA_WORK_DIR (work path) must be absolute path")
+				log.Fatal("MOLTGIT_WORK_DIR (work path) must be absolute path")
 			}
 		}
 
-		envCustomPath := getEnvFn("GITEA_CUSTOM")
+		envCustomPath := getEnvFn("MOLTGIT_CUSTOM")
 		if envCustomPath != "" {
 			tmpCustomPath.Set(envCustomPath)
 			if !filepath.IsAbs(tmpCustomPath.Value) {
-				log.Fatal("GITEA_CUSTOM (custom path) must be absolute path")
+				log.Fatal("MOLTGIT_CUSTOM (custom path) must be absolute path")
 			}
 		}
 	}
@@ -181,7 +181,7 @@ func InitWorkPathAndCfgProvider(getEnvFn func(name string) string, args ArgWorkP
 			log.Fatal("WORK_PATH in %q must be absolute path", configWorkPath)
 		}
 		configWorkPath = filepath.Clean(configWorkPath)
-		if tmpWorkPath.Value != "" && (getEnvFn("GITEA_WORK_DIR") != "" || args.WorkPath != "") {
+		if tmpWorkPath.Value != "" && (getEnvFn("MOLTGIT_WORK_DIR") != "" || args.WorkPath != "") {
 			fi1, err1 := os.Stat(tmpWorkPath.Value)
 			fi2, err2 := os.Stat(configWorkPath)
 			if err1 != nil || err2 != nil || !os.SameFile(fi1, fi2) {
@@ -200,12 +200,12 @@ func InitWorkPathAndCfgProvider(getEnvFn func(name string) string, args ArgWorkP
 
 // AppDataTempDir returns a managed temporary directory for the application data.
 // Using empty sub will get the managed base temp directory, and it's safe to delete it.
-// Gitea only creates subdirectories under it, but not the APP_TEMP_PATH directory itself.
-// * When APP_TEMP_PATH="/tmp": the managed temp directory is "/tmp/gitea-tmp"
+// MoltGit only creates subdirectories under it, but not the APP_TEMP_PATH directory itself.
+// * When APP_TEMP_PATH="/tmp": the managed temp directory is "/tmp/moltgit-tmp"
 // * When APP_TEMP_PATH is not set: the managed temp directory is "/{APP_DATA_PATH}/tmp"
 func AppDataTempDir(sub string) *tempdir.TempDir {
 	if appTempPathInternal != "" {
-		return tempdir.New(appTempPathInternal, "gitea-tmp/"+sub)
+		return tempdir.New(appTempPathInternal, "moltgit-tmp/"+sub)
 	}
 	if AppDataPath == "" {
 		panic("setting.AppDataPath is not set")

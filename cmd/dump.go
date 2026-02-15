@@ -26,14 +26,14 @@ import (
 // CmdDump represents the available dump sub-command.
 var CmdDump = &cli.Command{
 	Name:        "dump",
-	Usage:       "Dump Gitea files and database",
-	Description: `Dump compresses all related files and database into zip file. It can be used for backup and capture Gitea server image to send to maintainer`,
+	Usage:       "Dump MoltGit files and database",
+	Description: `Dump compresses all related files and database into zip file. It can be used for backup and capture MoltGit server image to send to maintainer`,
 	Action:      runDump,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "file",
 			Aliases: []string{"f"},
-			Usage:   `Name of the dump file which will be created, default to "gitea-dump-{time}.zip". Supply '-' for stdout. See type for available types.`,
+			Usage:   `Name of the dump file which will be created, default to "moltgit-dump-{time}.zip". Supply '-' for stdout. See type for available types.`,
 		},
 		&cli.BoolFlag{
 			Name:    "verbose",
@@ -191,7 +191,7 @@ func runDump(ctx context.Context, cmd *cli.Command) error {
 			fatal("Path does not exist: %s", tmpDir)
 		}
 
-		dbDump, err := os.CreateTemp(tmpDir, "gitea-db.sql")
+		dbDump, err := os.CreateTemp(tmpDir, "moltgit-db.sql")
 		if err != nil {
 			fatal("Failed to create tmp file: %v", err)
 		}
@@ -213,8 +213,8 @@ func runDump(ctx context.Context, cmd *cli.Command) error {
 			fatal("Failed to dump database: %v", err)
 		}
 
-		if err = dumper.AddFileByPath("gitea-db.sql", dbDump.Name()); err != nil {
-			fatal("Failed to include gitea-db.sql: %v", err)
+		if err = dumper.AddFileByPath("moltgit-db.sql", dbDump.Name()); err != nil {
+			fatal("Failed to include moltgit-db.sql: %v", err)
 		}
 	}
 

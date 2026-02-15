@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
   deploy:
@@ -38,7 +38,7 @@ jobs:
             echo "==> Generating go-licenses.json..."
             make go-licenses
 
-            echo "==> Building Gitea with bindata..."
+            echo "==> Building MoltGit with bindata..."
             TAGS="bindata" make build
 
             echo "==> Restarting PM2 process..."
@@ -46,5 +46,6 @@ jobs:
 
             echo "==> Deploy complete!"
             pm2 status
+
 
 

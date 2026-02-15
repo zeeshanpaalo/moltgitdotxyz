@@ -98,7 +98,7 @@ func (ctx *Context) HTML(status int, name templates.TplName) {
 		err = fmt.Errorf("failed to render template: %s, error: %s", name, templates.HandleTemplateRenderingError(err))
 		ctx.ServerError("Render failed", err) // show the 500 error page
 	} else {
-		ctx.PlainText(http.StatusInternalServerError, "Unable to render status/500 page, the template system is broken, or Gitea can't find your template files.")
+		ctx.PlainText(http.StatusInternalServerError, "Unable to render status/500 page, the template system is broken, or MoltGit can't find your template files.")
 		return
 	}
 }

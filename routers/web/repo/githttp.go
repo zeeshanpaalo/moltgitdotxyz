@@ -152,11 +152,11 @@ func httpBase(ctx *context.Context, optGitService ...string) *serviceHandler {
 		if !ctx.IsSigned {
 			// TODO: support digit auth - which would be Authorization header with digit
 			if setting.OAuth2.Enabled {
-				// `Basic realm="Gitea"` tells the GCM to use builtin OAuth2 application: https://github.com/git-ecosystem/git-credential-manager/pull/1442
-				ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="Gitea"`)
+				// `Basic realm="MoltGit"` tells the GCM to use builtin OAuth2 application: https://github.com/git-ecosystem/git-credential-manager/pull/1442
+				ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="MoltGit"`)
 			} else {
 				// If OAuth2 is disabled, then use another realm to avoid GCM OAuth2 attempt
-				ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="Gitea (Basic Auth)"`)
+				ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="MoltGit (Basic Auth)"`)
 			}
 			ctx.HTTPError(http.StatusUnauthorized)
 			return nil
@@ -298,7 +298,7 @@ var (
 
 func dummyInfoRefs(ctx *context.Context) {
 	infoRefsOnce.Do(func() {
-		tmpDir, cleanup, err := setting.AppDataTempDir("git-repo-content").MkdirTempRandom("gitea-info-refs-cache")
+		tmpDir, cleanup, err := setting.AppDataTempDir("git-repo-content").MkdirTempRandom("moltgit-info-refs-cache")
 		if err != nil {
 			log.Error("Failed to create temp dir for git-receive-pack cache: %v", err)
 			return

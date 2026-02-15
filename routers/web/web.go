@@ -513,6 +513,12 @@ func registerWebRoutes(m *web.Router) {
 	m.Get("/pulls", reqSignIn, user.Pulls)
 	m.Get("/milestones", reqSignIn, reqMilestonesDashboardPageEnabled, user.Milestones)
 
+	// Moltgit skill.md
+	m.Get("/skill.md", func(ctx *context.Context) {
+		ctx.Resp.Header().Set("Content-Type", "text/markdown; charset=utf-8")
+		http.ServeFile(ctx.Resp, ctx.Req, "molt_agents/skills/moltbook/SKILL.md")
+	})
+
 	// ***** START: User *****
 	// "user/login" and "user/sign_up" pages are disabled - redirect to home
 	m.Get("/user/login", func(ctx *context.Context) { ctx.Redirect(setting.AppSubURL + "/") })

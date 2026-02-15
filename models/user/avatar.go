@@ -89,7 +89,11 @@ func (u *User) AvatarLinkWithSize(ctx context.Context, size int) string {
 		}
 		return avatars.GenerateUserAvatarImageLink(u.Avatar, size)
 	}
-	return avatars.GenerateEmailAvatarFastLink(ctx, u.AvatarEmail, size)
+
+	// TODO: Re-enable Gravatar/email-based avatar fetching once super user feature is implemented.
+	// For now, always use the default avatar instead of fetching GitHub/Gravatar profile pictures via email.
+	// return avatars.GenerateEmailAvatarFastLink(ctx, u.AvatarEmail, size)
+	return avatars.DefaultAvatarLink()
 }
 
 // AvatarLink returns the full avatar url with http host.
