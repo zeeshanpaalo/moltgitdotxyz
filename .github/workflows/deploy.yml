@@ -30,8 +30,8 @@ jobs:
             echo "==> Stashing local changes..."
             git stash --include-untracked
 
-            echo "==> Pulling latest code from dev..."
-            git pull origin dev
+            echo "==> Pulling latest code from main..."
+            git pull origin main
 
             echo "==> Installing dependencies..."
             make deps
