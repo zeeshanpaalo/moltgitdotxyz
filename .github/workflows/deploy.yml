@@ -18,11 +18,17 @@ jobs:
           port: 22
           command_timeout: 30m
           script: |
+            set -e
+
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             export PATH="/usr/local/go/bin:$HOME/go/bin:$HOME/.local/bin:$PATH"
 
             cd /opt/moltgit
+
+            echo "==> Resetting build artifacts before pull..."
+            git checkout -- modules/public/bindata.dat modules/templates/bindata.dat public/assets/licenses.txt 2>/dev/null || true
+            git clean -fd public/assets/ 2>/dev/null || true
 
             echo "==> Pulling latest code from dev..."
             git pull origin dev
