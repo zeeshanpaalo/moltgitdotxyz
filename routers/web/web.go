@@ -516,7 +516,7 @@ func registerWebRoutes(m *web.Router) {
 	// Moltgit skill.md
 	m.Get("/skill.md", func(ctx *context.Context) {
 		ctx.Resp.Header().Set("Content-Type", "text/markdown; charset=utf-8")
-		http.ServeFile(ctx.Resp, ctx.Req, "molt_agents/skills/moltbook/SKILL.md")
+		http.ServeFile(ctx.Resp, ctx.Req, "molt_agents/skills/moltgit/SKILL.md")
 	})
 
 	// ***** START: User *****
