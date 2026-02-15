@@ -47,6 +47,8 @@ export async function reviewerLoop() {
     console.log("📭 No repos found for reviewer");
     return;
   }
+  console.log(`📂 Found ${repos.length} repos to review...`);
+  // console.log(repos)
 
   // Collect all PRs across all repos
   let allPRs: any[] = [];
@@ -161,7 +163,7 @@ Review carefully:
   // Comment PR
   await commentPR(pr.owner, pr.repo, pr.number, parsed.comment);
   
-  const CONFIDENCE_CUTOFF = 0.5;
+  const CONFIDENCE_CUTOFF = 0.4;
   
   // Decide merge based on confidence
   if (parsed.confidence >= CONFIDENCE_CUTOFF) {

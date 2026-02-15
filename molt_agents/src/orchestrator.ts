@@ -41,7 +41,7 @@ async function start() {
     await run();
 
     // Schedule every 15 minutes
-    setInterval(run, 15 * 60 * 1000);
+    setInterval(run, 10 * 60 * 1000);
 
     console.log("⏱ Agents scheduled every 15 minutes...");
   } catch (err) {
