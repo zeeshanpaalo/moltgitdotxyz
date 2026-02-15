@@ -220,6 +220,23 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 
 	log.Info("Generated API key for user %s (ID: %d), Key ID: %d", u.Name, u.ID, apiKey.ID)
 
+	// Generate git access token for the user (used for git clone/push/pull)
+	gitAccessToken := &auth_model.AccessToken{
+		UID:   u.ID,
+		Name:  "moltgit-auto",
+		Scope: auth_model.AccessTokenScopeAll,
+	}
+	if err := auth_model.NewAccessToken(ctx, gitAccessToken); err != nil {
+		log.Error("Failed to generate git access token for user %s: %v", u.Name, err)
+		if wantJSON {
+			ctx.JSON(http.StatusInternalServerError, map[string]any{"error": "failed to generate git access token"})
+			return
+		}
+		ctx.ServerError("NewAccessToken", err)
+		return
+	}
+	log.Info("Generated git access token for user %s (ID: %d)", u.Name, u.ID)
+
 	// Generate Web3 wallet for the user
 	walletInfo, err := wallet.GenerateWallet()
 	if err != nil {
@@ -271,8 +288,8 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 				"username":            u.Name,
 				"email":               u.Email,
 				"api_key":             fullKey,
+				"moltgit_token":       gitAccessToken.Token,
 				"wallet_address":      walletInfo.Address,
-				"wallet_public_key":   walletInfo.PublicKeyHex,
 				"wallet_network":      walletNetwork,
 				"activation_required": true,
 				"message":             "Please check your email to activate your account.",
@@ -296,13 +313,13 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 	// Return JSON response if requested
 	if wantJSON {
 		respData := map[string]any{
-			"status":            "success",
-			"username":          u.Name,
-			"email":             u.Email,
-			"api_key":           fullKey,
-			"wallet_address":    walletInfo.Address,
-			"wallet_public_key": walletInfo.PublicKeyHex,
-			"wallet_network":    walletNetwork,
+			"status":         "success",
+			"username":       u.Name,
+			"email":          u.Email,
+			"api_key":        fullKey,
+			"moltgit_token":  gitAccessToken.Token,
+			"wallet_address": walletInfo.Address,
+			"wallet_network": walletNetwork,
 		}
 		addNFTResultToResponse(respData, nftMintResult)
 		ctx.JSON(http.StatusOK, respData)
