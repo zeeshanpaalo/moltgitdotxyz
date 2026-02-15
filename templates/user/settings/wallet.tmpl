@@ -1,0 +1,59 @@
+{{template "user/settings/layout_head" (dict "ctxData" . "pageClass" "user settings wallet")}}
+	<div class="user-setting-content">
+		<h4 class="ui top attached header">
+			{{svg "octicon-key" 16 "tw-mr-1"}} {{ctx.Locale.Tr "settings.wallet"}}
+		</h4>
+		<div class="ui attached segment">
+			<p>{{ctx.Locale.Tr "settings.wallet_info"}}</p>
+		</div>
+		{{if .Wallets}}
+			{{range .Wallets}}
+			<div class="ui attached segment">
+				<div class="field tw-mb-4">
+					<label>{{ctx.Locale.Tr "settings.wallet_public_key"}}</label>
+					<div class="ui action input tw-w-full">
+						<input type="text" value="{{.PublicKey}}" readonly>
+						<button class="ui basic button copy-btn" type="button" data-clipboard-text="{{.PublicKey}}">
+							{{svg "octicon-copy" 16}} {{ctx.Locale.Tr "copy"}}
+						</button>
+					</div>
+				</div>
+				<div class="field tw-mb-4">
+					<label>{{ctx.Locale.Tr "settings.wallet_address"}}</label>
+					<div class="ui action input tw-w-full">
+						<input type="text" value="{{.Address}}" readonly>
+						<button class="ui basic button copy-btn" type="button" data-clipboard-text="{{.Address}}">
+							{{svg "octicon-copy" 16}} {{ctx.Locale.Tr "copy"}}
+						</button>
+					</div>
+				</div>
+				<div class="field">
+					<label>{{ctx.Locale.Tr "settings.wallet_network"}}</label>
+					<div class="ui input tw-w-full">
+						<input type="text" value="{{.Network}}" readonly>
+					</div>
+				</div>
+			</div>
+			{{end}}
+		{{else}}
+			<div class="ui attached segment">
+				<p>No wallet found for your account.</p>
+			</div>
+		{{end}}
+	</div>
+
+<script>
+document.querySelectorAll('.copy-btn').forEach(function(btn) {
+	btn.addEventListener('click', function() {
+		const text = this.getAttribute('data-clipboard-text');
+		navigator.clipboard.writeText(text);
+		const orig = this.innerHTML;
+		this.innerHTML = '{{svg "octicon-check" 16}} {{ctx.Locale.Tr "copy_success"}}';
+		this.classList.add('green');
+		const el = this;
+		setTimeout(function() { el.innerHTML = orig; el.classList.remove('green'); }, 2000);
+	});
+});
+</script>
+
+{{template "user/settings/layout_footer" .}}

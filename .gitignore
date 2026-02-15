@@ -163,6 +163,9 @@ $RECYCLE.BIN/
 WSL_SETUP.md
 CLAUDE.md
 app.ini.vps
+docs/MAKE_COMMANDS.md
+docs/API_KEY_AUTHENTICATION.md
+docs/WALLET_SETTINGS_NOT_SHOWING.md
 
 # Shell scripts (deploy/setup)
 *.sh

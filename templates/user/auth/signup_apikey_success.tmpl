@@ -1,7 +1,7 @@
 {{template "base/head" .}}
-<div class="page-content user signup success">
+<div role="main" aria-label="{{.Title}}" class="page-content user signup success">
 	<div class="ui middle very relaxed page grid">
-		<div class="column" style="max-width: 800px;">
+		<div class="column tw-flex tw-flex-col tw-gap-4 tw-max-w-2xl tw-m-auto">
 			<div class="ui success message">
 				<div class="header">
 					{{ctx.Locale.Tr "auth.sign_up_successful"}}
@@ -35,12 +35,17 @@
 			</div>
 			
 			<div class="ui attached segment">
-				<h4 class="ui header">{{ctx.Locale.Tr "settings.how_to_use_api_key"}}</h4>
-				<p>{{ctx.Locale.Tr "settings.api_key_usage_description"}}</p>
-				<pre style="background: #f5f5f5; padding: 10px; border-radius: 4px;">curl -H "Authorization: Bearer {{.APIKey}}" \
-  {{AppUrl}}api/v1/user/repos</pre>
+				<div class="field">
+					<label>Wallet Public Key</label>
+					<div class="ui action input">
+						<input id="wallet-public-key-value" type="text" value="{{.WalletPublicKey}}" readonly>
+						<button class="ui basic button" id="copy-wallet-public-key" data-content="{{ctx.Locale.Tr "copy_success"}}" data-variation="inverted tiny">
+							<i class="copy icon"></i> {{ctx.Locale.Tr "copy"}}
+						</button>
+					</div>
+				</div>
 			</div>
-			
+
 			<div class="ui bottom attached segment">
 				<form action="{{AppSubUrl}}/user/login/new" method="POST">
 					{{.CsrfTokenHtml}}
@@ -57,6 +62,22 @@
 <script>
 document.getElementById('copy-api-key').addEventListener('click', function() {
 	const input = document.getElementById('api-key-value');
+	input.select();
+	document.execCommand('copy');
+	
+	const btn = this;
+	const originalText = btn.innerHTML;
+	btn.innerHTML = '<i class="check icon"></i> Copied!';
+	btn.classList.add('green');
+	
+	setTimeout(function() {
+		btn.innerHTML = originalText;
+		btn.classList.remove('green');
+	}, 2000);
+});
+
+document.getElementById('copy-wallet-public-key').addEventListener('click', function() {
+	const input = document.getElementById('wallet-public-key-value');
 	input.select();
 	document.execCommand('copy');
 	

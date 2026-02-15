@@ -1,5 +1,4 @@
-<div class="flex-container-nav">
-	<div class="ui fluid vertical menu">
+<div class="ui fluid vertical menu">
 		<div class="header item">{{ctx.Locale.Tr "user.settings"}}</div>
 		<a class="{{if .PageIsSettingsProfile}}active {{end}}item" href="{{AppSubUrl}}/user/settings">
 			{{ctx.Locale.Tr "settings.profile"}}
@@ -31,6 +30,7 @@
 		<a class="{{if .PageIsSettingsAPIKeys}}active {{end}}item" href="{{AppSubUrl}}/user/settings/apikeys">
 			{{ctx.Locale.Tr "settings.api_keys"}}
 		</a>
+		{{/* Wallet link is in layout_head so it always shows even if navbar is overridden */}}
 		{{if not ($.UserDisabledFeatures.Contains "manage_ssh_keys" "manage_gpg_keys")}}
 		<a class="{{if .PageIsSettingsKeys}}active {{end}}item" href="{{AppSubUrl}}/user/settings/keys">
 			{{ctx.Locale.Tr "settings.ssh_gpg_keys"}}
@@ -69,4 +69,3 @@
 			{{ctx.Locale.Tr "settings.repos"}}
 		</a>
 	</div>
-</div>
