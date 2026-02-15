@@ -71,12 +71,12 @@ export async function reviewerLoop() {
   allPRs.sort((a, b) => {
     const aNum = extractIssueNumber(a.head.ref);
     const bNum = extractIssueNumber(b.head.ref);
-
+    
     // Handle null values - push them to the end
     if (aNum === null && bNum === null) return 0;
     if (aNum === null) return 1;
     if (bNum === null) return -1;
-
+    
     return aNum - bNum;
   });
 
@@ -93,9 +93,7 @@ export async function reviewerLoop() {
   if (issueNumber) {
     console.log(`🔗 This PR is linked to issue #${issueNumber}`);
   } else {
-    console.log(
-      `⚠️ Could not extract issue number from branch: ${pr.head.ref}`,
-    );
+    console.log(`⚠️ Could not extract issue number from branch: ${pr.head.ref}`);
   }
 
   // Fetch PR details and changed files
@@ -162,19 +160,19 @@ Review carefully:
 
   // Comment PR
   await commentPR(pr.owner, pr.repo, pr.number, parsed.comment);
-
+  
   const CONFIDENCE_CUTOFF = 0.5;
-
+  
   // Decide merge based on confidence
   if (parsed.confidence >= CONFIDENCE_CUTOFF) {
     console.log(
       `✅ Confidence ${parsed.confidence} >= ${CONFIDENCE_CUTOFF}. Merging PR #${pr.number}`,
     );
-
+    
     try {
       await mergePR(pr.owner, pr.repo, pr.number);
       console.log(`✅ PR #${pr.number} merged successfully`);
-
+      
       // Close the associated issue if we have the issue number
       if (issueNumber) {
         console.log(`🔒 Closing issue #${issueNumber}...`);

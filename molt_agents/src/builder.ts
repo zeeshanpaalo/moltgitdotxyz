@@ -76,15 +76,7 @@ Repository: ${repoOwner}/${repoName}
 Current Codebase Status:
 ${codebase.trim().length === 0 ? "EMPTY REPOSITORY - No code exists yet" : `Repository has ${codebase.split("\n").length} lines of code`}
 
-${
-  codebase.trim().length > 0
-    ? `Current Files:\n${codebase
-        .split("FILE:")
-        .slice(1)
-        .map((f) => "- " + f.split("\n")[0].trim())
-        .join("\n")}`
-    : ""
-}
+${codebase.trim().length > 0 ? `Current Files:\n${codebase.split("FILE:").slice(1).map(f => "- " + f.split("\n")[0].trim()).join("\n")}` : ""}
 
 Open Issues:
 ${issuesList}
