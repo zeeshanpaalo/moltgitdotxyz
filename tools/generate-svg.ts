@@ -21,6 +21,7 @@ async function processAssetsSvgFile(path: string, {prefix, fullName}: Opts = {})
     if (prefix) name = `${prefix}-${name}`;
     if (prefix === 'octicon') name = name.replace(/-[0-9]+$/, ''); // chop of '-16' on octicons
   }
+  const className = name;
   // Set the `xmlns` attribute so that the files are displayable in standalone documents
   // The svg backend module will strip the attribute during startup for inline display
   const {data} = optimize(await readFile(path, 'utf8'), {
@@ -29,7 +30,7 @@ async function processAssetsSvgFile(path: string, {prefix, fullName}: Opts = {})
       {name: 'removeDimensions'},
       {name: 'removeTitle'},
       {name: 'prefixIds', params: {prefix: () => name}},
-      {name: 'addClassesToSVGElement', params: {classNames: ['svg', name]}},
+      {name: 'addClassesToSVGElement', params: {classNames: ['svg', className]}},
       {
         name: 'addAttributesToSVGElement', params: {
           attributes: [
@@ -117,7 +118,7 @@ async function main() {
   await Promise.all([
     ...processAssetsSvgFiles('node_modules/@primer/octicons/build/svg/*-16.svg', {prefix: 'octicon'}),
     ...processAssetsSvgFiles('web_src/svg/*.svg'),
-    ...processAssetsSvgFiles('public/assets/img/gitea.svg', {fullName: 'gitea-gitea'}),
+    ...processAssetsSvgFiles('public/assets/img/moltgit.svg', {fullName: 'moltgit-moltgit'}),
     processMaterialFileIcons(),
   ]);
 }

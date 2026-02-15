@@ -19,9 +19,9 @@ type CommitStatusMap = {
 const commitStatus: CommitStatusMap = {
   pending: {name: 'octicon-dot-fill', color: 'yellow'},
   success: {name: 'octicon-check', color: 'green'},
-  error: {name: 'gitea-exclamation', color: 'red'},
+  error: {name: 'moltgit-exclamation', color: 'red'},
   failure: {name: 'octicon-x', color: 'red'},
-  warning: {name: 'gitea-exclamation', color: 'yellow'},
+  warning: {name: 'moltgit-exclamation', color: 'yellow'},
   skipped: {name: 'octicon-skip', color: 'grey'},
 };
 
@@ -448,7 +448,7 @@ export default defineComponent({
               class="item navigation tw-py-1" :class="{'disabled': page === 1}"
               @click="changePage(1)" :title="textFirstPage"
             >
-              <svg-icon name="gitea-double-chevron-left" :size="16" class="tw-mr-1"/>
+              <svg-icon name="moltgit-double-chevron-left" :size="16" class="tw-mr-1"/>
             </a>
             <a
               class="item navigation tw-py-1" :class="{'disabled': page === 1}"
@@ -467,7 +467,7 @@ export default defineComponent({
               class="item navigation tw-py-1" :class="{'disabled': page === finalPage}"
               @click="changePage(finalPage)" :title="textLastPage"
             >
-              <svg-icon name="gitea-double-chevron-right" :size="16" class="tw-ml-1"/>
+              <svg-icon name="moltgit-double-chevron-right" :size="16" class="tw-ml-1"/>
             </a>
           </div>
         </div>

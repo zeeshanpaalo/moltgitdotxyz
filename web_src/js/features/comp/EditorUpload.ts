@@ -21,10 +21,10 @@ export function triggerUploadStateChanged(target: HTMLElement) {
 function uploadFile(dropzoneEl: HTMLElement, file: File) {
   return new Promise((resolve) => {
     const curUploadId = uploadIdCounter++;
-    (file as any)._giteaUploadId = curUploadId;
+    (file as any)._moltgitUploadId = curUploadId;
     const dropzoneInst = dropzoneEl.dropzone;
     const onUploadDone = ({file}: {file: any}) => {
-      if (file._giteaUploadId === curUploadId) {
+      if (file._moltgitUploadId === curUploadId) {
         dropzoneInst.off(DropzoneCustomEventUploadDone, onUploadDone);
         resolve(file);
       }

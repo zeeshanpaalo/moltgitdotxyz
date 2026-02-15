@@ -71,7 +71,7 @@ func loadDBSetting(rootCfg ConfigProvider) {
 	Database.SSLMode = sec.Key("SSL_MODE").MustString("disable")
 	Database.CharsetCollation = sec.Key("CHARSET_COLLATION").String()
 
-	Database.Path = sec.Key("PATH").MustString(filepath.Join(AppDataPath, "gitea.db"))
+	Database.Path = sec.Key("PATH").MustString(filepath.Join(AppDataPath, "moltgit.db"))
 	Database.Timeout = sec.Key("SQLITE_TIMEOUT").MustInt(500)
 	Database.SQLiteJournalMode = sec.Key("SQLITE_JOURNAL_MODE").MustString("")
 
@@ -117,7 +117,7 @@ func DBConnStr() (string, error) {
 		connStr = fmt.Sprintf("server=%s; port=%s; database=%s; user id=%s; password=%s;", host, port, Database.Name, Database.User, Database.Passwd)
 	case "sqlite3":
 		if !EnableSQLite3 {
-			return "", errors.New("this Gitea binary was not built with SQLite3 support")
+			return "", errors.New("this MoltGit binary was not built with SQLite3 support")
 		}
 		if err := os.MkdirAll(filepath.Dir(Database.Path), os.ModePerm); err != nil {
 			return "", fmt.Errorf("Failed to create directories: %w", err)

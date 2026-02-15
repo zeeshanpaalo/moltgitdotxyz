@@ -80,12 +80,12 @@ func prepareOpenWithEditorApps(ctx *context.Context) {
 		case "vscode":
 			iconName = "octicon-vscode"
 		case "vscodium":
-			iconName = "gitea-vscodium"
+			iconName = "moltgit-vscodium"
 		case "jetbrains":
-			iconName = "gitea-jetbrains"
+			iconName = "moltgit-jetbrains"
 		default:
 			// TODO: it could support user's customized icon in the future
-			iconName = "gitea-git"
+			iconName = "moltgit-git"
 		}
 
 		tmplApps = append(tmplApps, map[string]any{
@@ -470,7 +470,7 @@ func Home(ctx *context.Context) {
 func RedirectRepoTreeToSrc(ctx *context.Context) {
 	// Redirect "/owner/repo/tree/*" requests to "/owner/repo/src/*",
 	// then use the deprecated "/src/*" handler to guess the ref type and render a file list page.
-	// This is done intentionally so that Gitea's repo URL structure matches other forges (GitHub/GitLab) provide,
+	// This is done intentionally so that MoltGit's repo URL structure matches other forges (GitHub/GitLab) provide,
 	// allowing us to construct submodule URLs across forges easily.
 	// For example, when viewing a submodule, we can simply construct the link as:
 	// * "https://gitea/owner/repo/tree/{CommitID}"

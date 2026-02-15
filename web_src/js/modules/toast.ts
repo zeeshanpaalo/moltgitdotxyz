@@ -24,12 +24,12 @@ const levels: ToastLevels = {
     duration: 2500,
   },
   warning: {
-    icon: 'gitea-exclamation',
+    icon: 'moltgit-exclamation',
     background: 'var(--color-orange)',
     duration: -1, // requires dismissal to hide
   },
   error: {
-    icon: 'gitea-exclamation',
+    icon: 'moltgit-exclamation',
     background: 'var(--color-red)',
     duration: -1, // requires dismissal to hide
   },
@@ -40,7 +40,7 @@ type ToastOpts = {
   preventDuplicates?: boolean | string,
 } & Options;
 
-type ToastifyElement = HTMLElement & {_giteaToastifyInstance?: Toast};
+type ToastifyElement = HTMLElement & {_moltgitToastifyInstance?: Toast};
 
 /** See https://github.com/apvarun/toastify-js#api for options */
 function showToast(message: string, level: Intent, {gravity, position, duration, useHtmlBody, preventDuplicates = true, ...other}: ToastOpts = {}): Toast | null {
@@ -80,7 +80,7 @@ function showToast(message: string, level: Intent, {gravity, position, duration,
   const el = toast.toastElement as ToastifyElement;
   el.querySelector('.toast-close')!.addEventListener('click', () => toast.hideToast());
   el.setAttribute('data-toast-unique-key', duplicateKey);
-  el._giteaToastifyInstance = toast;
+  el._moltgitToastifyInstance = toast;
   return toast;
 }
 
@@ -97,7 +97,7 @@ export function showErrorToast(message: string, opts?: ToastOpts): Toast | null 
 }
 
 function hideToastByElement(el: Element): void {
-  (el as ToastifyElement)?._giteaToastifyInstance?.hideToast();
+  (el as ToastifyElement)?._moltgitToastifyInstance?.hideToast();
 }
 
 export function hideToastsFrom(parent: Element): void {

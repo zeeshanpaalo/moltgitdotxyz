@@ -59,8 +59,8 @@ type ComboMarkdownEditorOptions = {
   easyMDEOptions?: EasyMDE.Options,
 };
 
-type ComboMarkdownEditorTextarea = HTMLTextAreaElement & {_giteaComboMarkdownEditor: any};
-type ComboMarkdownEditorContainer = HTMLElement & {_giteaComboMarkdownEditor?: any};
+type ComboMarkdownEditorTextarea = HTMLTextAreaElement & {_moltgitComboMarkdownEditor: any};
+type ComboMarkdownEditorContainer = HTMLElement & {_moltgitComboMarkdownEditor?: any};
 
 export class ComboMarkdownEditor {
   static EventEditorContentChanged = EventEditorContentChanged;
@@ -92,8 +92,8 @@ export class ComboMarkdownEditor {
   previewContext: string;
 
   constructor(container: ComboMarkdownEditorContainer, options:ComboMarkdownEditorOptions = {}) {
-    if (container._giteaComboMarkdownEditor) throw new Error('ComboMarkdownEditor already initialized');
-    container._giteaComboMarkdownEditor = this;
+    if (container._moltgitComboMarkdownEditor) throw new Error('ComboMarkdownEditor already initialized');
+    container._moltgitComboMarkdownEditor = this;
     this.options = options;
     this.container = container;
   }
@@ -125,7 +125,7 @@ export class ComboMarkdownEditor {
 
   setupTextarea() {
     this.textarea = this.container.querySelector('.markdown-text-editor')!;
-    this.textarea._giteaComboMarkdownEditor = this;
+    this.textarea._moltgitComboMarkdownEditor = this;
     this.textarea.id = generateElemId(`_combo_markdown_editor_`);
     this.textarea.addEventListener('input', () => triggerEditorContentChanged(this.container));
     this.applyEditorHeights(this.textarea, this.options.editorHeights);
@@ -282,9 +282,9 @@ export class ComboMarkdownEditor {
   prepareEasyMDEToolbarActions() {
     this.easyMDEToolbarDefault = [
       'bold', 'italic', 'strikethrough', '|', 'heading-1', 'heading-2', 'heading-3',
-      'heading-bigger', 'heading-smaller', '|', 'code', 'quote', '|', 'gitea-checkbox-empty',
-      'gitea-checkbox-checked', '|', 'unordered-list', 'ordered-list', '|', 'link', 'image',
-      'table', 'horizontal-rule', '|', 'gitea-switch-to-textarea',
+      'heading-bigger', 'heading-smaller', '|', 'code', 'quote', '|', 'moltgit-checkbox-empty',
+      'moltgit-checkbox-checked', '|', 'unordered-list', 'ordered-list', '|', 'link', 'image',
+      'table', 'horizontal-rule', '|', 'moltgit-switch-to-textarea',
     ];
   }
 
@@ -427,7 +427,7 @@ function applyMonospaceToAllEditors() {
 export function getComboMarkdownEditor(el: any): ComboMarkdownEditor | null {
   if (!el) return null;
   if (el.length) el = el[0];
-  return el._giteaComboMarkdownEditor;
+  return el._moltgitComboMarkdownEditor;
 }
 
 export async function initComboMarkdownEditor(container: HTMLElement, options:ComboMarkdownEditorOptions = {}) {

@@ -59,11 +59,11 @@ func SignUpAPIKeyPost(ctx *context.Context) {
 
 	wantJSON := ctx.FormBool("jsondata")
 
-	// Set default password if none provided
-	// if form.Password == "" {
-	// 	form.Password = "hunza123"
-	// 	form.Retype = "hunza123"
-	// }
+	// Set default password if none provided and a default is configured
+	if form.Password == "" && setting.Service.DefaultUserPassword != "" {
+		form.Password = setting.Service.DefaultUserPassword
+		form.Retype = setting.Service.DefaultUserPassword
+	}
 
 	// Permission denied if DisableRegistration or AllowOnlyExternalRegistration options are true
 	if setting.Service.DisableRegistration || setting.Service.AllowOnlyExternalRegistration {

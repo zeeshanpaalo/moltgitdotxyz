@@ -8,6 +8,8 @@ app.ini
 # Build artifacts
 gitea
 gitea.exe
+moltgit
+moltgit.exe
 *.exe
 *.dll
 *.so

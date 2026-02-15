@@ -955,7 +955,7 @@ tr.top-line-blame:first-of-type {
   border-bottom: 1px solid var(--color-secondary);
 }
 
-.migrate .svg.gitea-git {
+.migrate .svg.moltgit-git {
   color: var(--color-git);
 }
 
@@ -998,7 +998,7 @@ table th[data-sortt-desc] .svg {
   box-shadow: 0 0 0 1px var(--color-secondary) inset;
 }
 
-/* for "image" emojis like ":git:"  ":gitea:" and ":github:" (see CUSTOM_EMOJIS config option) */
+/* for "image" emojis like ":git:"  ":moltgit:" and ":github:" (see CUSTOM_EMOJIS config option) */
 .emoji img {
   border-width: 0 !important;
   margin: 0 !important;
@@ -1067,7 +1067,7 @@ table th[data-sortt-desc] .svg {
   padding-right: 24px;
 }
 
-/* Gitea uses SVG images instead of Fomantic builtin "<i>" font icons, so we need to reset the icon styles */
+/* MoltGit uses SVG images instead of Fomantic builtin "<i>" font icons, so we need to reset the icon styles */
 .ui.ui.dropdown > .icon.icon {
   position: initial; /* plain dropdown and button dropdown use flex layout for icons */
   padding: 0;

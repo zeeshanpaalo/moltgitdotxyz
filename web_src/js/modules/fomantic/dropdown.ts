@@ -2,7 +2,7 @@ import $ from 'jquery';
 import type {FomanticInitFunction} from '../../types.ts';
 import {generateElemId, queryElems} from '../../utils/dom.ts';
 
-const ariaPatchKey = '_giteaAriaPatchDropdown';
+const ariaPatchKey = '_moltgitAriaPatchDropdown';
 const fomanticDropdownFn = $.fn.dropdown;
 
 // use our own `$().dropdown` function to patch Fomantic's dropdown module
@@ -35,8 +35,8 @@ function ariaDropdownFn(this: any, ...args: Parameters<FomanticInitFunction>) {
     // then we need to re-delegate the callbacks.
     const $dropdown = $(el);
     const dropdownModule = $dropdown.data('module-dropdown');
-    if (!dropdownModule.giteaDelegated) {
-      dropdownModule.giteaDelegated = true;
+    if (!dropdownModule.moltgitDelegated) {
+      dropdownModule.moltgitDelegated = true;
       delegateDropdownModule($dropdown);
     }
   }

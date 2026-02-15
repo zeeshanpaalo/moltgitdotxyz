@@ -17,8 +17,8 @@ var (
 	// CmdManager represents the manager command
 	CmdManager = &cli.Command{
 		Name:        "manager",
-		Usage:       "Manage the running gitea process",
-		Description: "This is a command for managing the running gitea process",
+		Usage:       "Manage the running moltgit process",
+		Description: "This is a command for managing the running moltgit process",
 		Commands: []*cli.Command{
 			subcmdShutdown,
 			subcmdRestart,

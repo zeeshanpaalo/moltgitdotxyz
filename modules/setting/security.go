@@ -112,7 +112,7 @@ func loadSecurityFrom(rootCfg ConfigProvider) {
 		SecretKey = "!#@FDEWREWR&*("
 	}
 
-	CookieRememberName = sec.Key("COOKIE_REMEMBER_NAME").MustString("gitea_incredible")
+	CookieRememberName = sec.Key("COOKIE_REMEMBER_NAME").MustString("moltgit_incredible")
 
 	ReverseProxyAuthUser = sec.Key("REVERSE_PROXY_AUTHENTICATION_USER").MustString("X-WEBAUTH-USER")
 	ReverseProxyAuthEmail = sec.Key("REVERSE_PROXY_AUTHENTICATION_EMAIL").MustString("X-WEBAUTH-EMAIL")
@@ -151,7 +151,7 @@ func loadSecurityFrom(rootCfg ConfigProvider) {
 
 	InternalToken = loadSecret(sec, "INTERNAL_TOKEN_URI", "INTERNAL_TOKEN")
 	if InstallLock && InternalToken == "" {
-		// if Gitea has been installed but the InternalToken hasn't been generated (upgrade from an old release), we should generate
+		// if MoltGit has been installed but the InternalToken hasn't been generated (upgrade from an old release), we should generate
 		// some users do cluster deployment, they still depend on this auto-generating behavior.
 		generateSaveInternalToken(rootCfg)
 	}
@@ -177,6 +177,6 @@ func loadSecurityFrom(rootCfg ConfigProvider) {
 
 	// warn if the setting is set to false explicitly
 	if sectionHasDisableQueryAuthToken && !DisableQueryAuthToken {
-		log.Warn("Enabling Query API Auth tokens is not recommended. DISABLE_QUERY_AUTH_TOKEN will default to true in gitea 1.23 and will be removed in gitea 1.24.")
+		log.Warn("Enabling Query API Auth tokens is not recommended. DISABLE_QUERY_AUTH_TOKEN will default to true in MoltGit 1.23 and will be removed in MoltGit 1.24.")
 	}
 }

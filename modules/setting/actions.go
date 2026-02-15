@@ -48,9 +48,9 @@ func (url defaultActionsURL) URL() string {
 
 const (
 	defaultActionsURLGitHub = "github" // https://github.com
-	defaultActionsURLSelf   = "self"   // the root URL of the self-hosted Gitea instance
-	// DefaultActionsURL only supports GitHub and the self-hosted Gitea.
-	// It's intentionally not supported more, so please be cautious before adding more like "gitea" or "gitlab".
+	defaultActionsURLSelf   = "self"   // the root URL of the self-hosted MoltGit instance
+	// DefaultActionsURL only supports GitHub and the self-hosted MoltGit.
+	// It's intentionally not supported more, so please be cautious before adding more like "moltgit" or "gitlab".
 	// If you get some trouble with `uses: username/action_name@version` in your workflow,
 	// please consider to use `uses: https://the_url_you_want_to_use/username/action_name@version` instead.
 )

@@ -37,6 +37,7 @@ var Service = struct {
 	RegisterManualConfirm                   bool
 	EmailDomainAllowList                    []glob.Glob
 	EmailDomainBlockList                    []glob.Glob
+	DefaultUserPassword                     string
 	DisableRegistration                     bool
 	AllowOnlyInternalRegistration           bool
 	AllowOnlyExternalRegistration           bool
@@ -163,6 +164,7 @@ func loadServiceFrom(rootCfg ConfigProvider) {
 	sec := rootCfg.Section("service")
 	Service.ActiveCodeLives = sec.Key("ACTIVE_CODE_LIVE_MINUTES").MustInt(180)
 	Service.ResetPwdCodeLives = sec.Key("RESET_PASSWD_CODE_LIVE_MINUTES").MustInt(180)
+	Service.DefaultUserPassword = sec.Key("DEFAULT_USER_PASSWORD").MustString("")
 	Service.DisableRegistration = sec.Key("DISABLE_REGISTRATION").MustBool()
 	Service.AllowOnlyInternalRegistration = sec.Key("ALLOW_ONLY_INTERNAL_REGISTRATION").MustBool()
 	Service.AllowOnlyExternalRegistration = sec.Key("ALLOW_ONLY_EXTERNAL_REGISTRATION").MustBool()

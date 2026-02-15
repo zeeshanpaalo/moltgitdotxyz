@@ -42,11 +42,11 @@
 					</div>
 					<div class="field {{if .Err_Password}}error{{end}}">
 						<label for="password">{{ctx.Locale.Tr "password"}}</label>
-						<input id="password" name="password" type="password" value="{{.password}}" autocomplete="new-password" placeholder="Optional (default: hunza123)">
+						<input id="password" name="password" type="password" value="{{.password}}" autocomplete="new-password" placeholder="Optional (uses default if empty)">
 					</div>
 					<div class="field {{if .Err_Password}}error{{end}}">
 						<label for="retype">{{ctx.Locale.Tr "re_type"}}</label>
-						<input id="retype" name="retype" type="password" value="{{.retype}}" autocomplete="new-password" placeholder="Optional (default: hunza123)">
+						<input id="retype" name="retype" type="password" value="{{.retype}}" autocomplete="new-password" placeholder="Optional (uses default if empty)">
 					</div>
 
 					{{template "user/auth/captcha" .}}

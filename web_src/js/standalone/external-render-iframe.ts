@@ -13,11 +13,11 @@ RENDER_COMMAND = `echo '<div style="width: 100%; height: 2000px; border: 10px so
 
 function mainExternalRenderIframe() {
   const u = new URL(window.location.href);
-  const iframeId = u.searchParams.get('gitea-iframe-id');
+  const iframeId = u.searchParams.get('moltgit-iframe-id');
 
   // iframe is in different origin, so we need to use postMessage to communicate
   const postIframeMsg = (cmd: string, data: Record<string, any> = {}) => {
-    window.parent.postMessage({giteaIframeCmd: cmd, giteaIframeId: iframeId, ...data}, '*');
+    window.parent.postMessage({moltgitIframeCmd: cmd, moltgitIframeId: iframeId, ...data}, '*');
   };
 
   const updateIframeHeight = () => postIframeMsg('resize', {iframeHeight: document.documentElement.scrollHeight});

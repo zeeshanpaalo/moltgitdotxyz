@@ -26,7 +26,7 @@ func (r *CheckerState) Name() string {
 	return "update-checker"
 }
 
-// GiteaUpdateChecker returns error when new version of Gitea is available
+// GiteaUpdateChecker returns error when new version of MoltGit is available
 func GiteaUpdateChecker(httpEndpoint string) error {
 	httpClient := &http.Client{
 		Transport: &http.Transport{
@@ -62,7 +62,7 @@ func GiteaUpdateChecker(httpEndpoint string) error {
 	return UpdateRemoteVersion(req.Context(), respData.Latest.Version)
 }
 
-// UpdateRemoteVersion updates the latest available version of Gitea
+// UpdateRemoteVersion updates the latest available version of MoltGit
 func UpdateRemoteVersion(ctx context.Context, version string) (err error) {
 	return system.AppState.Set(ctx, &CheckerState{LatestVersion: version})
 }
@@ -76,7 +76,7 @@ func GetRemoteVersion(ctx context.Context) string {
 	return item.LatestVersion
 }
 
-// GetNeedUpdate returns true whether a newer version of Gitea is available
+// GetNeedUpdate returns true whether a newer version of MoltGit is available
 func GetNeedUpdate(ctx context.Context) bool {
 	curVer, err := version.NewVersion(setting.AppVer)
 	if err != nil {

@@ -621,6 +621,6 @@ func parseToken(ctx stdCtx.Context, authorization string, target *repo_model.Rep
 }
 
 func requireAuth(ctx *context.Context) {
-	ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="gitea-lfs"`)
+	ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="moltgit-lfs"`)
 	writeStatus(ctx, http.StatusUnauthorized)
 }

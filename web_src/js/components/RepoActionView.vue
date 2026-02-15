@@ -37,7 +37,7 @@ type LogLineCommand = {
 // * Workflow command outputs log commands like "::group::the-title", "::add-matcher::...."
 // * Workflow runner parses and processes the commands to "##[group]", apply "matchers", hide secrets, etc.
 // * The reported logs are the processed logs.
-// HOWEVER: Gitea runner does not completely process those commands. Many works are done by the frontend at the moment.
+// HOWEVER: MoltGit runner does not completely process those commands. Many works are done by the frontend at the moment.
 const LogLinePrefixCommandMap: Record<string, LogLineCommandName> = {
   '::group::': 'group',
   '##[group]': 'group',
@@ -593,25 +593,25 @@ export default defineComponent({
               </button>
               <div class="menu transition action-job-menu" :class="{visible: menuVisible}" v-if="menuVisible" v-cloak>
                 <a class="item" @click="toggleTimeDisplay('seconds')">
-                  <i class="icon"><SvgIcon :name="timeVisible['log-time-seconds'] ? 'octicon-check' : 'gitea-empty-checkbox'"/></i>
+                  <i class="icon"><SvgIcon :name="timeVisible['log-time-seconds'] ? 'octicon-check' : 'moltgit-empty-checkbox'"/></i>
                   {{ locale.showLogSeconds }}
                 </a>
                 <a class="item" @click="toggleTimeDisplay('stamp')">
-                  <i class="icon"><SvgIcon :name="timeVisible['log-time-stamp'] ? 'octicon-check' : 'gitea-empty-checkbox'"/></i>
+                  <i class="icon"><SvgIcon :name="timeVisible['log-time-stamp'] ? 'octicon-check' : 'moltgit-empty-checkbox'"/></i>
                   {{ locale.showTimeStamps }}
                 </a>
                 <a class="item" @click="toggleFullScreen()">
-                  <i class="icon"><SvgIcon :name="isFullScreen ? 'octicon-check' : 'gitea-empty-checkbox'"/></i>
+                  <i class="icon"><SvgIcon :name="isFullScreen ? 'octicon-check' : 'moltgit-empty-checkbox'"/></i>
                   {{ locale.showFullScreen }}
                 </a>
 
                 <div class="divider"/>
                 <a class="item" @click="optionAlwaysAutoScroll = !optionAlwaysAutoScroll">
-                  <i class="icon"><SvgIcon :name="optionAlwaysAutoScroll ? 'octicon-check' : 'gitea-empty-checkbox'"/></i>
+                  <i class="icon"><SvgIcon :name="optionAlwaysAutoScroll ? 'octicon-check' : 'moltgit-empty-checkbox'"/></i>
                   {{ locale.logsAlwaysAutoScroll }}
                 </a>
                 <a class="item" @click="optionAlwaysExpandRunning = !optionAlwaysExpandRunning">
-                  <i class="icon"><SvgIcon :name="optionAlwaysExpandRunning ? 'octicon-check' : 'gitea-empty-checkbox'"/></i>
+                  <i class="icon"><SvgIcon :name="optionAlwaysExpandRunning ? 'octicon-check' : 'moltgit-empty-checkbox'"/></i>
                   {{ locale.logsAlwaysExpandRunning }}
                 </a>
 
@@ -631,7 +631,7 @@ export default defineComponent({
               <!-- If the job is done and the job step log is loaded for the first time, show the loading icon
                 currentJobStepsStates[i].cursor === null means the log is loaded for the first time
               -->
-              <SvgIcon v-if="isDone(run.status) && currentJobStepsStates[i].expanded && currentJobStepsStates[i].cursor === null" name="gitea-running" class="tw-mr-2 rotate-clockwise"/>
+              <SvgIcon v-if="isDone(run.status) && currentJobStepsStates[i].expanded && currentJobStepsStates[i].cursor === null" name="moltgit-running" class="tw-mr-2 rotate-clockwise"/>
               <SvgIcon v-else :name="currentJobStepsStates[i].expanded ? 'octicon-chevron-down': 'octicon-chevron-right'" :class="['tw-mr-2', !isExpandable(jobStep.status) && 'tw-invisible']"/>
               <ActionRunStatus :status="jobStep.status" class="tw-mr-2"/>
 

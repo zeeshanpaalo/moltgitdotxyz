@@ -81,7 +81,7 @@ func IsEmailDomainListed(globs []glob.Glob, email string) bool {
 	return false
 }
 
-// IsAPIURL checks if URL is current Gitea instance API URL
+// IsAPIURL checks if URL is current MoltGit instance API URL
 func IsAPIURL(uri string) bool {
 	return strings.HasPrefix(strings.ToLower(uri), strings.ToLower(setting.AppURL+"api"))
 }

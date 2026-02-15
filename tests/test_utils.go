@@ -27,7 +27,7 @@ import (
 func InitTest(requireGitea bool) {
 	testlogger.Init()
 
-	setting.SetupGiteaTestEnv()
+	setting.SetupMoltGitTestEnv()
 
 	unittest.InitSettingsForTesting()
 	setting.Repository.DefaultBranch = "master" // many test code still assume that default branch is called "master"

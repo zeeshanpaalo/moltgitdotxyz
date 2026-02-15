@@ -106,7 +106,7 @@
 				{{template "repo/issue/view_content/update_branch_by_merge" $}}
 			{{else if .Issue.PullRequest.IsChecking}}
 				<div class="item">
-					{{svg "gitea-running" 16 "rotate-clockwise"}}
+					{{svg "moltgit-running" 16 "rotate-clockwise"}}
 					{{ctx.Locale.Tr "repo.pulls.is_checking"}}
 				</div>
 			{{else if .Issue.PullRequest.IsAncestor}}
@@ -381,7 +381,7 @@
 			To test it:
 			* Enable "Manually Merged" feature in the Repository Settings
 			* Create a pull request, either:
-			* - Merge the pull request branch locally and push the merged commit to Gitea
+			* - Merge the pull request branch locally and push the merged commit to MoltGit
 			* - Make some conflicts between the base branch and the pull request branch
 			* Then the Manually Merged form will be shown in the merge form
 			*/}}

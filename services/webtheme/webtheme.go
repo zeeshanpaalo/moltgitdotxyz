@@ -47,10 +47,10 @@ func (info *ThemeMetaInfo) GetDescription() string {
 
 func (info *ThemeMetaInfo) GetExtraIconName() string {
 	if info.ColorblindType == "red-green" {
-		return "gitea-colorblind-redgreen"
+		return "moltgit-colorblind-redgreen"
 	}
 	if info.ColorblindType == "blue-yellow" {
-		return "gitea-colorblind-blueyellow"
+		return "moltgit-colorblind-blueyellow"
 	}
 	return ""
 }
@@ -63,7 +63,7 @@ func parseThemeMetaInfoToMap(cssContent string) map[string]string {
 		it is difficult to control the overriding, and it's difficult to avoid user's customized overridden styles.
 	*/
 	metaInfoContent := cssContent
-	if pos := strings.LastIndex(metaInfoContent, "gitea-theme-meta-info"); pos >= 0 {
+	if pos := strings.LastIndex(metaInfoContent, "moltgit-theme-meta-info"); pos >= 0 {
 		metaInfoContent = metaInfoContent[pos:]
 	}
 
@@ -81,7 +81,7 @@ func parseThemeMetaInfoToMap(cssContent string) map[string]string {
 )
 `
 	reMetaInfoItem = strings.ReplaceAll(reMetaInfoItem, "\n", "")
-	reMetaInfoBlock := `\bgitea-theme-meta-info\s*\{(` + reMetaInfoItem + `+)\}`
+	reMetaInfoBlock := `\bmoltgit-theme-meta-info\s*\{(` + reMetaInfoItem + `+)\}`
 	re := regexp.MustCompile(reMetaInfoBlock)
 	matchedMetaInfoBlock := re.FindAllStringSubmatch(metaInfoContent, -1)
 	if len(matchedMetaInfoBlock) == 0 {
@@ -177,7 +177,7 @@ func initThemes() {
 		return availableThemes[i].DisplayName < availableThemes[j].DisplayName
 	})
 	if len(availableThemes) == 0 {
-		setting.LogStartupProblem(1, log.ERROR, "No theme candidate in asset files, but Gitea requires there should be at least one usable theme")
+		setting.LogStartupProblem(1, log.ERROR, "No theme candidate in asset files, but MoltGit requires there should be at least one usable theme")
 		availableThemes = []*ThemeMetaInfo{defaultThemeMetaInfoByInternalName(setting.UI.DefaultTheme)}
 	}
 }

@@ -26,7 +26,7 @@ func TestMinioStorageIterator(t *testing.T) {
 			Endpoint:        "minio:9000",
 			AccessKeyID:     "123456",
 			SecretAccessKey: "12345678",
-			Bucket:          "gitea",
+			Bucket:          "moltgit",
 			Location:        "us-east-1",
 		},
 	})
