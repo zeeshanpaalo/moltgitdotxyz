@@ -44,6 +44,21 @@ export async function searchReposWithIssues() {
   return res.data.data; // Gitea returns { ok, data }
 }
 
+export async function searchReposWithIssuesForPlanner() {
+  const res = await client(config.builderAgentName).get(
+    `/repos/search?has_issues=true&is_private=false&limit=50`,
+  );
+
+  const allRepos = res.data.data; // Gitea returns { ok, data }
+
+  // Filter to only return repos owned by the planner
+  const plannerRepos = allRepos.filter(
+    (repo: any) => repo.owner.login === config.plannerAgentName,
+  );
+
+  return plannerRepos;
+}
+
 export async function getIssuesForRepo(
   owner: string,
   repo: string,

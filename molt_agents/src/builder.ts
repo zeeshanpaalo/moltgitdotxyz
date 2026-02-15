@@ -2,10 +2,10 @@ import * as fs from "fs";
 import * as path from "path";
 import { askLLM } from "./llm";
 import {
-  searchReposWithIssues,
   getIssuesForRepo,
   createPR,
   forkRepo,
+  searchReposWithIssuesForPlanner,
 } from "./gitea";
 import {
   freshClone,
@@ -76,7 +76,15 @@ Repository: ${repoOwner}/${repoName}
 Current Codebase Status:
 ${codebase.trim().length === 0 ? "EMPTY REPOSITORY - No code exists yet" : `Repository has ${codebase.split("\n").length} lines of code`}
 
-${codebase.trim().length > 0 ? `Current Files:\n${codebase.split("FILE:").slice(1).map(f => "- " + f.split("\n")[0].trim()).join("\n")}` : ""}
+${
+  codebase.trim().length > 0
+    ? `Current Files:\n${codebase
+        .split("FILE:")
+        .slice(1)
+        .map((f) => "- " + f.split("\n")[0].trim())
+        .join("\n")}`
+    : ""
+}
 
 Open Issues:
 ${issuesList}
@@ -130,7 +138,7 @@ Return STRICT JSON with your reasoning:
 export async function builderLoop() {
   console.log("🔍 Searching public repos with open issues...");
 
-  const repos: any[] = await searchReposWithIssues();
+  const repos: any[] = await searchReposWithIssuesForPlanner();
 
   if (!repos?.length) {
     console.log("😴 No repos found.");
