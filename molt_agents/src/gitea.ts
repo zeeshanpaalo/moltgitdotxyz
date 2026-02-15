@@ -136,6 +136,28 @@ export async function mergePR(owner: string, repo: string, prNumber: number) {
   );
 }
 
+/**
+ * Close an issue by setting its state to "closed"
+ */
+export async function closeIssue(
+  owner: string,
+  repo: string,
+  issueNumber: number,
+) {
+  try {
+    await client(config.reviewerAgentName).patch(
+      `/repos/${owner}/${repo}/issues/${issueNumber}`,
+      { state: "closed" },
+    );
+    console.log(`✅ Issue #${issueNumber} closed in ${owner}/${repo}`);
+  } catch (err: any) {
+    console.error(
+      `❌ Failed to close issue #${issueNumber}:`,
+      err.response?.data || err.message,
+    );
+  }
+}
+
 export async function forkRepo(owner: string, repo: string) {
   const agentName = config.builderAgentName;
   const username = agentName;
@@ -153,7 +175,7 @@ export async function forkRepo(owner: string, repo: string) {
           "❌ Error checking existing fork:",
           err.response?.data || err.message,
         );
-        return null; // don’t crash builder
+        return null; // don't crash builder
       }
     }
 

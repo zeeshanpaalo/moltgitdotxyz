@@ -2,10 +2,9 @@ import { askLLM } from "./llm";
 import {
   getAllReposForReviewer,
   getPRs,
-  // isCollaborator,
-  // addCollaborator,
   commentPR,
   mergePR,
+  closeIssue,
 } from "./gitea";
 import axios from "axios";
 import { config } from "./config";
@@ -13,12 +12,12 @@ import { getToken } from "./tokenStore";
 
 /**
  * Extract issue number from branch name.
- * Expected format: ${builderName}-issue-${issueNumber}
- * Example: builder-1-issue-3
+ * Expected format: ${proposerName}-issue-${issueNumber}
+ * Example: builder-agent-issue-3
  */
-function extractIssueNumber(branch: string): number {
+function extractIssueNumber(branch: string): number | null {
   const match = branch.match(/-issue-(\d+)$/);
-  return match ? parseInt(match[1], 10) : Number.MAX_SAFE_INTEGER;
+  return match ? parseInt(match[1], 10) : null;
 }
 
 async function getPRDetails(owner: string, repo: string, prNumber: number) {
@@ -72,19 +71,32 @@ export async function reviewerLoop() {
   allPRs.sort((a, b) => {
     const aNum = extractIssueNumber(a.head.ref);
     const bNum = extractIssueNumber(b.head.ref);
+
+    // Handle null values - push them to the end
+    if (aNum === null && bNum === null) return 0;
+    if (aNum === null) return 1;
+    if (bNum === null) return -1;
+
     return aNum - bNum;
   });
 
-  // Pick the earliest PR
-  // lets do pick an PR randomly
+  // Pick a PR randomly
   const randomIndex = Math.floor(Math.random() * allPRs.length);
   const pr = allPRs[randomIndex];
-  // pr should be where allPRs.find where number is 6
-  // const pr = allPRs.find((p) => p.number === 13);
-  console.log(pr);
+
   console.log(
     `📝 Reviewing PR #${pr.number} from ${pr.owner}/${pr.repo}, branch ${pr.head.ref}`,
   );
+
+  // Extract issue number from branch name
+  const issueNumber = extractIssueNumber(pr.head.ref);
+  if (issueNumber) {
+    console.log(`🔗 This PR is linked to issue #${issueNumber}`);
+  } else {
+    console.log(
+      `⚠️ Could not extract issue number from branch: ${pr.head.ref}`,
+    );
+  }
 
   // Fetch PR details and changed files
   const { pr: prDetails, files } = await getPRDetails(
@@ -150,17 +162,33 @@ Review carefully:
 
   // Comment PR
   await commentPR(pr.owner, pr.repo, pr.number, parsed.comment);
+
   const CONFIDENCE_CUTOFF = 0.5;
+
   // Decide merge based on confidence
   if (parsed.confidence >= CONFIDENCE_CUTOFF) {
     console.log(
       `✅ Confidence ${parsed.confidence} >= ${CONFIDENCE_CUTOFF}. Merging PR #${pr.number}`,
     );
-    await mergePR(pr.owner, pr.repo, pr.number);
+
+    try {
+      await mergePR(pr.owner, pr.repo, pr.number);
+      console.log(`✅ PR #${pr.number} merged successfully`);
+
+      // Close the associated issue if we have the issue number
+      if (issueNumber) {
+        console.log(`🔒 Closing issue #${issueNumber}...`);
+        await closeIssue(pr.owner, pr.repo, issueNumber);
+      }
+    } catch (err: any) {
+      console.error(
+        `❌ Failed to merge PR #${pr.number}:`,
+        err.response?.data || err.message,
+      );
+    }
   } else {
     console.log(
-      `🛑 PR #${pr.number} not merged. Confidence ${parsed.confidence}`,
+      `🛑 PR #${pr.number} not merged. Confidence ${parsed.confidence} < ${CONFIDENCE_CUTOFF}`,
     );
   }
-
 }

@@ -93,9 +93,12 @@ export async function builderLoop() {
   const issue: any = pickRandom(issues);
   console.log(`🛠 Working on issue #${issue.number}: ${issue.title}`);
 
-  const random = Math.floor(Math.random() * 10000);
-  const branch = `issue-${issue.number}-${Date.now()}-${random}`;
+  // Deterministic branch naming: {proposerName}-issue-{issueNumber}
+  // This allows the reviewer to extract the issue number for closing
+  const branch = `${forkOwner}-issue-${issue.number}`;
   const dir = `./workspace-${repoName}`;
+
+  console.log(`🌿 Creating branch: ${branch}`);
 
   // Clone fork
   await freshClone(dir, builderUsername, forkOwner, repoName);
