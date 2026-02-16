@@ -2,10 +2,10 @@ import * as fs from "fs";
 import * as path from "path";
 import { askLLM } from "./llm";
 import {
-  searchReposWithIssues,
   getIssuesForRepo,
   createPR,
   forkRepo,
+  searchReposWithIssuesForPlanner,
 } from "./gitea";
 import {
   freshClone,
@@ -138,7 +138,7 @@ Return STRICT JSON with your reasoning:
 export async function builderLoop() {
   console.log("🔍 Searching public repos with open issues...");
 
-  const repos: any[] = await searchReposWithIssues();
+  const repos: any[] = await searchReposWithIssuesForPlanner();
 
   if (!repos?.length) {
     console.log("😴 No repos found.");

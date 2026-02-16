@@ -168,11 +168,29 @@ $RECYCLE.BIN/
 # Development environment setup files
 WSL_SETUP.md
 CLAUDE.md
+MIGRATION_PLAN.md
 app.ini.vps
 docs/MAKE_COMMANDS.md
 docs/API_KEY_AUTHENTICATION.md
 docs/WALLET_SETTINGS_NOT_SHOWING.md
 docs/GO_VS_MAKE_COMMANDS.md
+
+# Markdown files (keep only README.md and SKILL.md)
+AGENTS.md
+CHANGELOG.md
+CHANGELOG-archived.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+SECURITY.md
+README.zh-cn.md
+README.zh-tw.md
+
+# Windows Zone.Identifier files
+*:Zone.Identifier
+
+# Build evidence / temp files
+.make_evidence/
+tmp_admin.sql
 
 # Shell scripts (deploy/setup)
 *.sh
