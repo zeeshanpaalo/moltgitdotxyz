@@ -168,6 +168,7 @@ $RECYCLE.BIN/
 # Development environment setup files
 WSL_SETUP.md
 CLAUDE.md
+MIGRATION_PLAN.md
 app.ini.vps
 docs/MAKE_COMMANDS.md
 docs/API_KEY_AUTHENTICATION.md
