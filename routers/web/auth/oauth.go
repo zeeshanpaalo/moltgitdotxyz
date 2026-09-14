@@ -350,7 +350,11 @@ func handleOAuth2SignIn(ctx *context.Context, authSource *auth.Source, u *user_m
 	// An admin-disabled user has no such signature, so we leave IsActive alone
 	// and let verifyAuthWithOptions route them through the prohibit-login / activate page.
 	if !u.IsActive {
-		extLogin, hasExt, err := user_model.GetExternalLogin(ctx, authSource.ID, gothUser.UserID)
+		extLogin := &user_model.ExternalLoginUser{
+			ExternalID:    gothUser.UserID,
+			LoginSourceID: authSource.ID,
+		}
+		hasExt, err := user_model.GetExternalLogin(ctx, extLogin)
 		if err != nil {
 			ctx.ServerError("GetExternalLogin", err)
 			return
