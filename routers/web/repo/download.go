@@ -7,6 +7,7 @@ package repo
 import (
 	"time"
 
+	auth_model "code.gitea.io/gitea/models/auth"
 	git_model "code.gitea.io/gitea/models/git"
 	"code.gitea.io/gitea/modules/git"
 	"code.gitea.io/gitea/modules/httpcache"
@@ -17,6 +18,11 @@ import (
 	"code.gitea.io/gitea/routers/common"
 	"code.gitea.io/gitea/services/context"
 )
+
+func checkDownloadTokenScope(ctx *context.Context) bool {
+	context.CheckRepoScopedToken(ctx, ctx.Repo.Repository, auth_model.Read)
+	return !ctx.Written()
+}
 
 // ServeBlobOrLFS download a git.Blob redirecting to LFS if necessary
 func ServeBlobOrLFS(ctx *context.Context, blob *git.Blob, lastModified *time.Time) error {
